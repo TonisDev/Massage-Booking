@@ -253,102 +253,57 @@
 <script>
 const WORKER_URL = "https://massage-booking-proxy.tonisdevv.workers.dev";
 
-function getTodayAthens() {
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Europe/Athens",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
+document.getElementById("bookingForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const statusBox = document.getElementById("statusBox");
+  const submitBtn = document.getElementById("submitBtn");
+
+  statusBox.style.display = "none";
+  statusBox.className = "status-box";
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Αποστολή...";
+
+  const formData = {
+    name: document.getElementById("name").value,
+    phone: document.getElementById("phone").value,
+    instagram: document.getElementById("instagram").value,
+    massageType: document.getElementById("massageType").value,
+    service: document.getElementById("service").value,
+    date: document.getElementById("date").value,
+    timeSlot: document.getElementById("timeSlot").value,
+    notes: document.getElementById("notes").value,
+    website: document.getElementById("website").value // Honeypot
+  };
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
-    return formatter.format(new Date());
-}
 
-const dateInput = document.getElementById("date");
-const today = getTodayAthens();
-dateInput.min = today;
-dateInput.value = today;
+    const result = await response.json();
 
-function cleanText(value, maxLength) {
-    return String(value || "").replace(/[\u0000-\u001F\u007F]/g, "").trim().slice(0, maxLength);
-}
-
-document.getElementById("bookingForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const btn = document.getElementById("submitBtn");
-    const status = document.getElementById("status");
-    const form = document.getElementById("bookingForm");
-
-    const name = cleanText(document.getElementById("name").value, 80);
-    const phone = cleanText(document.getElementById("phone").value, 30);
-    let instagram = cleanText(document.getElementById("instagram").value, 40);
-    const massageType = document.getElementById("massageType").value;
-    const service = document.getElementById("service").value;
-    const date = document.getElementById("date").value;
-    const timeSlot = document.getElementById("timeSlot").value;
-    const notes = cleanText(document.getElementById("notes").value, 1000);
-    const website = cleanText(document.getElementById("website").value, 100);
-
-    if (!phone && !instagram) {
-        status.className = "error";
-        status.innerText = "❌ Παρακαλώ συμπληρώστε τουλάχιστον ένα μέσο επικοινωνίας (Τηλέφωνο ή Instagram).";
-        return;
+    if (response.ok && result.success) {
+      statusBox.textContent = "✅ Το αίτημα εστάλη με επιτυχία! Θα επικοινωνήσουμε σύντομα.";
+      statusBox.classList.add("success");
+      statusBox.style.display = "block";
+      document.getElementById("bookingForm").reset();
+    } else {
+      throw new Error(result.error || `HTTP error ${response.status}`);
     }
-
-    if (phone) {
-        let digits = phone.replace(/\D/g, "");
-        if (digits.startsWith("30")) digits = digits.slice(2);
-
-        if (!/^(69|2)\d{8}$/.test(digits)) {
-            status.className = "error";
-            status.innerText = "❌ Παρακαλώ εισάγετε ένα έγκυρο ελληνικό τηλέφωνο.";
-            return;
-        }
-    }
-
-    if (instagram) {
-        instagram = instagram.replace(/\s/g, "").replace(/^@+/, "");
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Αποστολή...";
-    status.className = "";
-    status.innerText = "";
-
-    try {
-        const response = await fetch(WORKER_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                name, phone, instagram, massageType, service, date, timeSlot, notes, website
-            })
-        });
-
-        let result;
-        try {
-            result = await response.json();
-        } catch {
-            result = {};
-        }
-
-        if (response.ok && result.success === true) {
-            status.className = "success";
-            status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα.";
-            form.reset();
-            dateInput.min = getTodayAthens();
-            dateInput.value = getTodayAthens();
-        } else {
-            status.className = "error";
-            status.innerText = "❌ " + (result.error || "Υπήρξε σφάλμα κατά την αποστολή. Δοκιμάστε ξανά.");
-        }
-    } catch (error) {
-        console.error(error);
-        status.className = "error";
-        status.innerText = "❌ Υπήρξε σφάλμα κατά την αποστολή. Δοκιμάστε ξανά.";
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "Αποστολή Αιτήματος";
-    }
+  } catch (err) {
+    console.error("Submission Error:", err);
+    statusBox.textContent = `❌ Σφάλμα: ${err.message}`;
+    statusBox.classList.add("error");
+    statusBox.style.display = "block";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Αποστολή Αιτήματος";
+  }
 });
 </script>
 
