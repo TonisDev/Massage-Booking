@@ -225,95 +225,103 @@
 </div>
 
 <script>
-    const WORKER_URL = 'https://massage-booking-proxy.tonisdevv.workers.dev/';
+const WORKER_URL = 'https://massage-booking-proxy.tonisdevv.workers.dev/';
 
-    // Αυτόματο κλείδωμα περασμένων ημερομηνιών
-    const today = new Date().toISOString().split('T')[0];
-    const dateInput = document.getElementById('date');
-    dateInput.min = today;
-    dateInput.value = today;
+// Αυτόματο κλείδωμα περασμένων ημερομηνιών
+const today = new Date().toISOString().split('T')[0];
+const dateInput = document.getElementById('date');
+dateInput.min = today;
+dateInput.value = today;
 
-    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+// Συνάρτηση καθαρισμού ειδικών χαρακτήρων Markdown
+function cleanMarkdown(text) {
+    return text.replace(/[*_`\[\]()~>#+-=|{}.!]/g, ' ');
+}
+
+document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('status');
+    
+    const rawPhone = document.getElementById('phone').value.trim();
+    let instagram = document.getElementById('instagram').value.trim();
+
+    if (!rawPhone && !instagram) {
+        status.className = "error";
+        status.innerText = "❌ Παρακαλώ συμπληρώστε τουλάχιστον ένα μέσο επικοινωνίας (Τηλέφωνο ή Instagram).";
+        return;
+    }
+
+    let phone = "";
+    if (rawPhone) {
+        // Καθαρισμός όλων των μη ψηφιακών χαρακτήρων
+        const digitsOnly = rawPhone.replace(/\D/g, '');
+        // Αφαίρεση του 30 από την αρχή αν υπάρχει (π.χ. 3069... -> 69...)
+        phone = digitsOnly.startsWith('30') ? digitsOnly.slice(2) : digitsOnly;
         
-        const btn = document.getElementById('submitBtn');
-        const status = document.getElementById('status');
-        
-        const phone = document.getElementById('phone').value.trim();
-        let instagram = document.getElementById('instagram').value.trim();
-
-        if (!phone && !instagram) {
+        const phoneRegex = /^(69|2)\d{8}$/;
+        if (!phoneRegex.test(phone)) {
             status.className = "error";
-            status.innerText = "❌ Παρακαλώ συμπληρώστε τουλάχιστον ένα μέσο επικοινωνίας (Τηλέφωνο ή Instagram).";
+            status.innerText = "❌ Παρακαλώ εισάγετε ένα έγκυρο ελληνικό τηλέφωνο (10 ψηφία).";
             return;
         }
+    }
 
-        if (phone) {
-            // Καθαρισμός κενών, παυλών και πρόθεματος +30 / 0030
-            const cleanPhone = phone.replace(/[\s\-\+]/g, '').replace(/^30/, '');
-            const phoneRegex = /^(69|2)\d{8}$/;
-            
-            if (!phoneRegex.test(cleanPhone)) {
-                status.className = "error";
-                status.innerText = "❌ Παρακαλώ εισάγετε ένα έγκυρο ελληνικό τηλέφωνο (10 ψηφία).";
-                return;
-            }
+    btn.disabled = true;
+    btn.innerText = "Αποστολή...";
+    status.innerText = "";
+
+    // Καθαρισμός εισόδων από επικίνδυνους χαρακτήρες Markdown
+    const name = cleanMarkdown(document.getElementById('name').value.trim());
+    const massageType = document.getElementById('massageType').value;
+    const service = document.getElementById('service').value;
+    const rawDate = dateInput.value;
+    const [year, month, day] = rawDate.split('-');
+    const formattedDate = `${day}/${month}/${year}`;
+    
+    const timeSlot = document.getElementById('timeSlot').value;
+    const notes = cleanMarkdown(document.getElementById('notes').value.trim()) || "Καμία";
+
+    if (instagram) {
+        instagram = cleanMarkdown(instagram);
+        if (!instagram.startsWith('@')) instagram = '@' + instagram;
+    }
+
+    const formattedMessage = `🔔 *ΝΕΟ ΑΙΤΗΜΑ ΡΑΝΤΕΒΟΥ*\n\n` +
+                            `👤 *Όνομα:* ${name}\n` +
+                            `📞 *Τηλέφωνο:* ${phone || "Δεν δόθηκε"}\n` +
+                            `📸 *Instagram:* ${instagram || "Δεν δόθηκε"}\n` +
+                            `💆‍♂️ *Είδος:* ${massageType}\n` +
+                            `⏱ *Διάρκεια:* ${service}\n` +
+                            `📅 *Ημερομηνία:* ${formattedDate}\n` +
+                            `⏰ *Ώρα:* ${timeSlot}\n` +
+                            `📝 *Σημειώσεις:* ${notes}`;
+
+    try {
+        const response = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: formattedMessage })
+        });
+
+        const resData = await response.json();
+
+        if (response.ok && resData.success) {
+            status.className = "success";
+            status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα.";
+            document.getElementById('bookingForm').reset();
+            dateInput.value = today;
+        } else {
+            throw new Error(resData.error || "Server error");
         }
+    } catch (err) {
+        status.className = "error";
+        status.innerText = "❌ Υπήρξε σφάλμα κατά την αποστολή. Δοκιμάστε ξανά.";
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Αποστολή Αιτήματος";
+    }
+});
 
-        btn.disabled = true;
-        btn.innerText = "Αποστολή...";
-        status.innerText = "";
 
-        const name = document.getElementById('name').value.trim();
-        const massageType = document.getElementById('massageType').value;
-        const service = document.getElementById('service').value;
-        const rawDate = dateInput.value;
-        const [year, month, day] = rawDate.split('-');
-        const formattedDate = `${day}/${month}/${year}`;
-        
-        const timeSlot = document.getElementById('timeSlot').value;
-        const notes = document.getElementById('notes').value.trim() || "Καμία";
-
-        if (instagram && !instagram.startsWith('@')) {
-            instagram = '@' + instagram;
-        }
-
-        const formattedMessage = `🔔 *ΝΕΟ ΑΙΤΗΜΑ ΡΑΝΤΕΒΟΥ*\n\n` +
-                                `👤 *Όνομα:* ${name}\n` +
-                                `📞 *Τηλέφωνο:* ${phone || "Δεν δόθηκε"}\n` +
-                                `📸 *Instagram:* ${instagram || "Δεν δόθηκε"}\n` +
-                                `💆‍♂️ *Είδος:* ${massageType}\n` +
-                                `⏱ *Διάρκεια:* ${service}\n` +
-                                `📅 *Ημερομηνία:* ${formattedDate}\n` +
-                                `⏰ *Ώρα:* ${timeSlot}\n` +
-                                `📝 *Σημειώσεις:* ${notes}`;
-
-        try {
-            const response = await fetch(WORKER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: formattedMessage })
-            });
-
-            const resData = await response.json();
-
-            if (response.ok && resData.success) {
-                status.className = "success";
-                status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα.";
-                document.getElementById('bookingForm').reset();
-                dateInput.value = today;
-            } else {
-                throw new Error();
-            }
-        } catch (err) {
-            status.className = "error";
-            status.innerText = "❌ Υπήρξε σφάλμα. Παρακαλώ δοκιμάστε ξανά.";
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Αποστολή Αιτήματος";
-        }
-    });
-</script>
-
-</body>
-</html>
