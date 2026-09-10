@@ -262,32 +262,44 @@
           website: document.getElementById("website").value
         };
 
-        try {
-          const response = await fetch(WORKER_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          });
+try {
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
 
-          const result = await response.json();
+  // Handle non-200 raw text responses gracefully
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage = `HTTP ${response.status}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      errorMessage = parsed.error || errorMessage;
+    } catch {
+      errorMessage = errorText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
 
-          if (response.ok && result.success) {
-            statusBox.textContent = "✅ Το αίτημα εστάλη με επιτυχία! Θα επικοινωνήσουμε σύντομα.";
-            statusBox.classList.add("success");
-            statusBox.style.display = "block";
-            form.reset();
-            dateInput.value = today;
-          } else {
-            throw new Error(result.error || `HTTP ${response.status}`);
-          }
-        } catch (err) {
-          console.error("Error:", err);
-          statusBox.textContent = `❌ ${err.message || "Σφάλμα κατά την αποστολή."}`;
-          statusBox.classList.add("error");
-          statusBox.style.display = "block";
-        } finally {
+  const result = await response.json();
+
+  if (result.success) {
+    statusBox.textContent = "✅ Το αίτημα εστάλη με επιτυχία! Θα επικοινωνήσουμε σύντομα.";
+    statusBox.classList.add("success");
+    statusBox.style.display = "block";
+    form.reset();
+  } else {
+    throw new Error(result.error || "Αποτυχία αποστολής.");
+  }
+} catch (err) {
+  console.error("Error:", err);
+  statusBox.textContent = `❌ ${err.message}`;
+  statusBox.classList.add("error");
+  statusBox.style.display = "block";
+} finally {
           submitBtn.disabled = false;
           submitBtn.textContent = "Αποστολή Αιτήματος";
         }
