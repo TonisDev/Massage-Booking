@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Κράτηση Ραντεβού Μασάζ</title>
+  <!-- Flatpickr CSS & JS for Calendar View -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Optional Greek Localization for Calendar -->
+<script src="https://npmcdn.flatpickr/dist/l10n/gr.js"></script>
+  <title>Αίτημα Ραντεβού Μασάζ</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -182,10 +187,10 @@
         </select>
       </div>
 
-      <div class="form-group">
-        <label for="date">Ημερομηνία *</label>
-        <input type="date" id="date" required />
-      </div>
+<div class="form-group">
+  <label for="date">Ημερομηνία *</label>
+  <input type="text" id="date" required placeholder="Επιλέξτε ημερομηνία..." />
+</div>
 
       <div class="form-group">
         <label for="timeSlot">Ώρα *</label>
@@ -230,81 +235,84 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const WORKER_URL = "https://massage-booking-proxy.tonisdevv.workers.dev";
-      const form = document.getElementById("bookingForm");
-      const statusBox = document.getElementById("statusBox");
-      const submitBtn = document.getElementById("submitBtn");
+document.addEventListener("DOMContentLoaded", function () {
+  const WORKER_URL = "https://massage-booking-proxy.tonisdevv.workers.dev";
+  const form = document.getElementById("bookingForm");
+  const statusBox = document.getElementById("statusBox");
+  const submitBtn = document.getElementById("submitBtn");
 
-      // Set default date to today
-      const dateInput = document.getElementById("date");
-      const today = new Date().toISOString().split("T")[0];
-      dateInput.value = today;
-      dateInput.min = today;
-
-      form.addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        statusBox.style.display = "none";
-        statusBox.className = "status-box";
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Αποστολή...";
-
-        const formData = {
-          name: document.getElementById("name").value,
-          phone: document.getElementById("phone").value,
-          instagram: document.getElementById("instagram").value,
-          massageType: document.getElementById("massageType").value,
-          service: document.getElementById("service").value,
-          date: document.getElementById("date").value,
-          timeSlot: document.getElementById("timeSlot").value,
-          notes: document.getElementById("notes").value,
-          website: document.getElementById("website").value
-        };
-
-try {
-  const response = await fetch(WORKER_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(formData),
+  // Initialize Flatpickr Calendar (Replaces the old date code)
+  const datePicker = flatpickr("#date", {
+    locale: "gr",
+    dateFormat: "Y-m-d",
+    defaultDate: "today",
+    minDate: "today",
+    disableMobile: "true" // Set "true" if you want Flatpickr UI on mobile phones too
   });
 
-  // Handle non-200 raw text responses gracefully
-  if (!response.ok) {
-    const errorText = await response.text();
-    let errorMessage = `HTTP ${response.status}`;
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    statusBox.style.display = "none";
+    statusBox.className = "status-box";
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Αποστολή...";
+
+    const formData = {
+      name: document.getElementById("name").value,
+      phone: document.getElementById("phone").value,
+      instagram: document.getElementById("instagram").value,
+      massageType: document.getElementById("massageType").value,
+      service: document.getElementById("service").value,
+      date: document.getElementById("date").value,
+      timeSlot: document.getElementById("timeSlot").value,
+      notes: document.getElementById("notes").value,
+      website: document.getElementById("website").value
+    };
+
     try {
-      const parsed = JSON.parse(errorText);
-      errorMessage = parsed.error || errorMessage;
-    } catch {
-      errorMessage = errorText || errorMessage;
-    }
-    throw new Error(errorMessage);
-  }
-
-  const result = await response.json();
-
-  if (result.success) {
-    statusBox.textContent = "✅ Το αίτημα εστάλη με επιτυχία! Θα επικοινωνήσουμε σύντομα.";
-    statusBox.classList.add("success");
-    statusBox.style.display = "block";
-    form.reset();
-  } else {
-    throw new Error(result.error || "Αποτυχία αποστολής.");
-  }
-} catch (err) {
-  console.error("Error:", err);
-  statusBox.textContent = `❌ ${err.message}`;
-  statusBox.classList.add("error");
-  statusBox.style.display = "block";
-} finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Αποστολή Αιτήματος";
-        }
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-    });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `HTTP ${response.status}`;
+        try {
+          const parsed = JSON.parse(errorText);
+          errorMessage = parsed.error || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        statusBox.textContent = "✅ Το αίτημα εστάλη με επιτυχία! Θα επικοινωνήσουμε σύντομα.";
+        statusBox.classList.add("success");
+        statusBox.style.display = "block";
+        form.reset();
+        datePicker.setDate(new Date()); // Reset calendar to today after send
+      } else {
+        throw new Error(result.error || "Αποτυχία αποστολής.");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      statusBox.textContent = `❌ ${err.message}`;
+      statusBox.classList.add("error");
+      statusBox.style.display = "block";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Αποστολή Αιτήματος";
+    }
+  });
+});
   </script>
 
 </body>
