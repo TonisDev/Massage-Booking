@@ -1,8 +1,117 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Κράτηση Ραντεβού Massage</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 450px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #219150;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Κράτηση Ραντεβού</h2>
+    <form id="bookingForm">
+        <div class="form-group">
+            <label for="name">Ονοματεπώνυμο *</label>
+            <input type="text" id="name" required placeholder="π.χ. Γιώργος Παπαδόπουλος">
+        </div>
+
+        <div class="form-group">
+            <label for="contact">Τηλέφωνο / Email *</label>
+            <input type="text" id="contact" required placeholder="69XXXXXXXX">
+        </div>
+
+        <div class="form-group">
+            <label for="date">Ημερομηνία *</label>
+            <input type="date" id="date" required>
+        </div>
+
+        <div class="form-group">
+            <label for="time">Ώρα *</label>
+            <input type="time" id="time" required>
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Σημειώσεις / Διεύθυνση</label>
+            <textarea id="notes" rows="3" placeholder="Επιπλέον πληροφορίες..."></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
+    </form>
+    <div id="status"></div>
+</div>
+
 <script>
-    // Set your Cloudflare Worker URL here
     const WORKER_URL = 'https://massage-booking-proxy.tonisdevv.workers.dev/';
 
-    // Prevent past dates
+    // Prevent past dates from being selected
     document.getElementById('date').min = new Date().toISOString().split('T')[0];
 
     document.getElementById('bookingForm').addEventListener('submit', async function(e) {
@@ -52,3 +161,6 @@
         }
     });
 </script>
+
+</body>
+</html>
