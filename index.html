@@ -9,9 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Cloudflare Turnstile -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
     <style>
         * {
             box-sizing: border-box;
@@ -138,7 +135,7 @@
         .success { color: #00e676; }
         .error { color: #ff5252; }
 
-        /* Honeypot - hidden from real users */
+        /* Honeypot field - hidden from human users */
         .website-field {
             position: absolute !important;
             left: -9999px !important;
@@ -146,13 +143,6 @@
             height: 1px !important;
             opacity: 0 !important;
             pointer-events: none !important;
-        }
-
-        .turnstile-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -251,13 +241,8 @@
             <textarea id="notes" rows="3" maxlength="1000" placeholder="π.χ. Διεύθυνση κατ' οίκον, σημεία με ένταση/πόνο, επιθυμητή πίεση..."></textarea>
         </div>
 
-        <!-- Honeypot -->
+        <!-- Invisible Honeypot -->
         <input type="text" id="website" name="website" class="website-field" tabindex="-1" autocomplete="off" aria-hidden="true">
-
-        <!-- Cloudflare Turnstile -->
-        <div class="turnstile-container">
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAAEvIUriwEjx68STr" data-theme="dark" data-size="normal"></div>
-        </div>
 
         <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
     </form>
@@ -293,14 +278,6 @@ document.getElementById("bookingForm").addEventListener("submit", async function
     const btn = document.getElementById("submitBtn");
     const status = document.getElementById("status");
     const form = document.getElementById("bookingForm");
-
-    const turnstileToken = typeof turnstile !== "undefined" ? turnstile.getResponse() : "";
-
-    if (!turnstileToken) {
-        status.className = "error";
-        status.innerText = "❌ Παρακαλώ ολοκληρώστε τον έλεγχο ασφαλείας.";
-        return;
-    }
 
     const name = cleanText(document.getElementById("name").value, 80);
     const phone = cleanText(document.getElementById("phone").value, 30);
@@ -343,7 +320,7 @@ document.getElementById("bookingForm").addEventListener("submit", async function
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                name, phone, instagram, massageType, service, date, timeSlot, notes, website, turnstileToken
+                name, phone, instagram, massageType, service, date, timeSlot, notes, website
             })
         });
 
@@ -369,9 +346,6 @@ document.getElementById("bookingForm").addEventListener("submit", async function
         status.className = "error";
         status.innerText = "❌ Υπήρξε σφάλμα κατά την αποστολή. Δοκιμάστε ξανά.";
     } finally {
-        if (typeof turnstile !== "undefined") {
-            turnstile.reset();
-        }
         btn.disabled = false;
         btn.innerText = "Αποστολή Αιτήματος";
     }
