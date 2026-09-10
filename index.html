@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Κράτηση Ραντεβού Massage</title>
+    <title>Αίτημα Ραντεβού Massage</title>
+    <!-- Import Sharp Modern Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f7f6;
+            background-color: #0d0e12;
+            color: #e0e6ed;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -15,80 +25,119 @@
             align-items: center;
             min-height: 100vh;
         }
+
         .container {
-            background: #ffffff;
-            padding: 30px;
+            background: #16181d;
+            padding: 32px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #2a2e39;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             width: 100%;
             max-width: 480px;
         }
+
         h2 {
             margin-top: 0;
-            color: #2c3e50;
+            color: #ffffff;
             text-align: center;
-            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
         }
+
         .info-box {
-            background-color: #eef7fc;
-            border-left: 4px solid #3498db;
-            padding: 12px 15px;
+            background-color: #1a2332;
+            border-left: 3px solid #00b0ff;
+            padding: 12px 16px;
             border-radius: 4px;
             font-size: 13px;
-            color: #2c3e50;
-            line-height: 1.4;
+            color: #90caf9;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
             margin-bottom: 20px;
         }
-        .form-group {
-            margin-bottom: 18px;
-        }
+
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #34495e;
-            font-size: 14px;
+            color: #c2c9d6;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
         .subtitle-label {
             font-size: 11px;
-            color: #7f8c8d;
-            font-weight: normal;
+            color: #6b7280;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 400;
         }
+
         input, textarea, select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
+            padding: 12px 14px;
+            background-color: #0d0e12;
+            border: 1px solid #2a2e39;
             border-radius: 6px;
-            box-sizing: border-box;
+            color: #ffffff;
             font-size: 14px;
+            transition: all 0.2s ease;
         }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #00b0ff;
+            box-shadow: 0 0 0 2px rgba(0, 176, 255, 0.2);
+        }
+
+        /* Dark style for date/time controls */
+        color-scheme: dark;
+
         button {
             width: 100%;
-            padding: 12px;
-            background-color: #27ae60;
-            color: white;
+            padding: 14px;
+            background-color: #00e676;
+            color: #051e11;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
             margin-top: 10px;
         }
+
         button:hover {
-            background-color: #219150;
+            background-color: #00c853;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
+            transform: translateY(-1px);
         }
+
         button:disabled {
-            background-color: #bdc3c7;
+            background-color: #2a2e39;
+            color: #6b7280;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
+
         #status {
-            margin-top: 15px;
+            margin-top: 18px;
             text-align: center;
             font-weight: 600;
+            font-size: 14px;
         }
-        .success { color: #27ae60; }
-        .error { color: #e74c3c; }
+
+        .success { color: #00e676; }
+        .error { color: #ff5252; }
     </style>
 </head>
 <body>
@@ -97,7 +146,7 @@
     <h2>Αίτημα για Ραντεβού</h2>
     
     <div class="info-box">
-        📌 <strong>Σημείωση:</strong> Επιλέξτε την ημερομηνία και ώρα που σας εξυπηρετεί καλύτερα. Μόλις λάβω το αίτημά σας, θα επικοινωνήσω μαζί σας το συντομότερο για την επιβεβαίωση της διαθεσιμότητας!
+        📌 <strong>Σημείωση:</strong> Επιλέξτε την ημερομηνία και ώρα που σας εξυπηρετεί. Μόλις λάβω το αίτημά σας, θα επικοινωνήσω μαζί σας για επιβεβαίωση!
     </div>
 
     <form id="bookingForm">
@@ -107,17 +156,27 @@
         </div>
 
         <div class="form-group">
-            <label for="phone">Τηλέφωνο Επικοινωνίας <span class="subtitle-label">(Απαιτείται Τηλέφωνο ή Instagram)</span></label>
+            <label for="phone">Τηλέφωνο Επικοινωνίας <span class="subtitle-label">(Τηλέφωνο ή Instagram)</span></label>
             <input type="tel" id="phone" placeholder="π.χ. 6912345678">
         </div>
 
         <div class="form-group">
-            <label for="instagram">Instagram Profile <span class="subtitle-label">(Απαιτείται Τηλέφωνο ή Instagram)</span></label>
+            <label for="instagram">Instagram Profile <span class="subtitle-label">(Τηλέφωνο ή Instagram)</span></label>
             <input type="text" id="instagram" placeholder="@username">
         </div>
 
         <div class="form-group">
-            <label for="service">Διάρκεια / Είδος Συνεδρίας *</label>
+            <label for="massageType">Είδος Μασάζ *</label>
+            <select id="massageType" required>
+                <option value="Χαλαρωτικό (Relaxing)">Χαλαρωτικό</option>
+                <option value="Deep Tissue">Deep Tissue</option>
+                <option value="Αθλητικό (Sports)">Αθλητικό</option>
+                <option value="Συνδυαστικό / Mix">Έμφαση σε τραυματισμό</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="service">Διάρκεια Συνεδρίας *</label>
             <select id="service" required>
                 <option value="60 λεπτά">60 λεπτά</option>
                 <option value="90 λεπτά">90 λεπτά</option>
@@ -137,7 +196,7 @@
 
         <div class="form-group">
             <label for="notes">Σημειώσεις / Διεύθυνση / Περιοχή</label>
-            <textarea id="notes" rows="3" placeholder="π.χ. Διεύθυνση για κατ' οίκον, τυχόν τραυματισμοί ή προτιμήσεις..."></textarea>
+            <textarea id="notes" rows="3" placeholder="π.χ. Διεύθυνση για κατ' οίκον, τυχόν τραυματισμοί..."></textarea>
         </div>
 
         <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
@@ -160,18 +219,14 @@
         const phone = document.getElementById('phone').value.trim();
         let instagram = document.getElementById('instagram').value.trim();
 
-        // 1. Έλεγχος ότι τουλάχιστον ένα από τα δύο έχει συμπληρωθεί
         if (!phone && !instagram) {
             status.className = "error";
             status.innerText = "❌ Παρακαλώ συμπληρώστε τουλάχιστον ένα μέσο επικοινωνίας (Τηλέφωνο ή Instagram).";
             return;
         }
 
-        // 2. Validation Τηλεφώνου (αν έχει συμπληρωθεί)
         if (phone) {
-            // Καθαρισμός από κενά ή παύλες
             const cleanPhone = phone.replace(/[\s\-]/g, '');
-            // Έλεγχος αν αποτελείται από 10 ψηφία και ξεκινάει από 69 ή 2
             const phoneRegex = /^(69|2)\d{8}$/;
             
             if (!phoneRegex.test(cleanPhone)) {
@@ -186,12 +241,12 @@
         status.innerText = "";
 
         const name = document.getElementById('name').value;
+        const massageType = document.getElementById('massageType').value;
         const service = document.getElementById('service').value;
         const date = document.getElementById('date').value;
         const time = document.getElementById('time').value;
         const notes = document.getElementById('notes').value || "Καμία";
 
-        // Μορφοποίηση Instagram
         if (instagram && !instagram.startsWith('@')) {
             instagram = '@' + instagram;
         }
@@ -200,6 +255,7 @@
                                 `👤 *Όνομα:* ${name}\n` +
                                 `📞 *Τηλέφωνο:* ${phone || "Δεν δόθηκε"}\n` +
                                 `📸 *Instagram:* ${instagram || "Δεν δόθηκε"}\n` +
+                                `💆‍♂️ *Είδος:* ${massageType}\n` +
                                 `⏱ *Διάρκεια:* ${service}\n` +
                                 `📅 *Ημερομηνία:* ${date}\n` +
                                 `⏰ *Ώρα:* ${time}\n` +
@@ -216,7 +272,7 @@
 
             if (response.ok && resData.success) {
                 status.className = "success";
-                status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα για την επιβεβαίωση.";
+                status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα.";
                 document.getElementById('bookingForm').reset();
             } else {
                 throw new Error();
