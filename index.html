@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Αίτημα Ραντεβού Massage</title>
+    <title>Κράτηση Ραντεβού Massage</title>
     <!-- Import Sharp Modern Font (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,6 +61,15 @@
             margin-bottom: 20px;
         }
 
+        .inline-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .inline-group > div {
+            flex: 1;
+        }
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -96,7 +105,6 @@
             box-shadow: 0 0 0 2px rgba(0, 176, 255, 0.2);
         }
 
-        /* Dark style for date/time controls */
         color-scheme: dark;
 
         button {
@@ -171,7 +179,8 @@
                 <option value="Χαλαρωτικό (Relaxing)">Χαλαρωτικό</option>
                 <option value="Deep Tissue">Deep Tissue</option>
                 <option value="Αθλητικό (Sports)">Αθλητικό</option>
-                <option value="Συνδυαστικό / Mix">Έμφαση σε τραυματισμό</option>
+                <option value="Σουηδικό (Swedish)">Σουηδικό</option>
+                <option value="Συνδυαστικό / Mix">Συνδυαστικό / Mix (Κατόπιν συνεννόησης)</option>
             </select>
         </div>
 
@@ -184,19 +193,52 @@
             </select>
         </div>
 
+        <!-- Dropdowns για Ημερομηνία -->
         <div class="form-group">
-            <label for="date">Προτεινόμενη Ημερομηνία *</label>
-            <input type="date" id="date" required>
+            <label>Προτεινόμενη Ημερομηνία (2026) *</label>
+            <div class="inline-group">
+                <div>
+                    <select id="day" required>
+                        <option value="" disabled selected>Ημέρα</option>
+                        <!-- Θα γεμίσει δυναμικά από JS 1-31 -->
+                    </select>
+                </div>
+                <div>
+                    <select id="month" required>
+                        <option value="" disabled selected>Μήνας</option>
+                        <option value="09">Σεπτέμβριος</option>
+                        <option value="10">Οκτώβριος</option>
+                        <option value="11">Νοέμβριος</option>
+                        <option value="12">Δεκέμβριος</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
+        <!-- Dropdown για Ώρα -->
         <div class="form-group">
-            <label for="time">Προτεινόμενη Ώρα *</label>
-            <input type="time" id="time" required>
+            <label for="timeSlot">Προτεινόμενη Ώρα *</label>
+            <select id="timeSlot" required>
+                <option value="" disabled selected>Επιλέξτε ώρα...</option>
+                <option value="09:00">09:00</option>
+                <option value="10:00">10:00</option>
+                <option value="11:00">11:00</option>
+                <option value="12:00">12:00</option>
+                <option value="13:00">13:00</option>
+                <option value="14:00">14:00</option>
+                <option value="15:00">15:00</option>
+                <option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+                <option value="18:00">18:00</option>
+                <option value="19:00">19:00</option>
+                <option value="20:00">20:00</option>
+                <option value="21:00">21:00</option>
+            </select>
         </div>
 
         <div class="form-group">
             <label for="notes">Σημειώσεις / Διεύθυνση / Περιοχή</label>
-            <textarea id="notes" rows="3" placeholder="π.χ. Διεύθυνση για κατ' οίκον, τυχόν τραυματισμοί..."></textarea>
+            <textarea id="notes" rows="3" placeholder="π.χ. Διεύθυνση κατ' οίκον, σημεία με ένταση/πόνο, επιθυμητή πίεση..."></textarea>
         </div>
 
         <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
@@ -207,8 +249,15 @@
 <script>
     const WORKER_URL = 'https://massage-booking-proxy.tonisdevv.workers.dev/';
 
-    // Απαγόρευση επιλογής περασμένων ημερομηνιών
-    document.getElementById('date').min = new Date().toISOString().split('T')[0];
+    // Γέμισμα Ημερών 1-31 στο dropdown
+    const daySelect = document.getElementById('day');
+    for (let i = 1; i <= 31; i++) {
+        const dayValue = i < 10 ? `0${i}` : `${i}`;
+        const option = document.createElement('option');
+        option.value = dayValue;
+        option.textContent = dayValue;
+        daySelect.appendChild(option);
+    }
 
     document.getElementById('bookingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -243,8 +292,13 @@
         const name = document.getElementById('name').value;
         const massageType = document.getElementById('massageType').value;
         const service = document.getElementById('service').value;
-        const date = document.getElementById('date').value;
-        const time = document.getElementById('time').value;
+        
+        // Σύνθεση Ημερομηνίας (Default Year: 2026)
+        const day = document.getElementById('day').value;
+        const month = document.getElementById('month').value;
+        const fullDate = `${day}/${month}/2026`;
+        
+        const timeSlot = document.getElementById('timeSlot').value;
         const notes = document.getElementById('notes').value || "Καμία";
 
         if (instagram && !instagram.startsWith('@')) {
@@ -257,8 +311,8 @@
                                 `📸 *Instagram:* ${instagram || "Δεν δόθηκε"}\n` +
                                 `💆‍♂️ *Είδος:* ${massageType}\n` +
                                 `⏱ *Διάρκεια:* ${service}\n` +
-                                `📅 *Ημερομηνία:* ${date}\n` +
-                                `⏰ *Ώρα:* ${time}\n` +
+                                `📅 *Ημερομηνία:* ${fullDate}\n` +
+                                `⏰ *Ώρα:* ${timeSlot}\n` +
                                 `📝 *Σημειώσεις:* ${notes}`;
 
         try {
