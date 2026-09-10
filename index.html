@@ -1,311 +1,299 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Κράτηση Ραντεβού Massage</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Κράτηση Ραντεβού Μασάζ</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --error: #ef4444;
+      --success: #22c55e;
+    }
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
 
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        body {
-            background-color: #0d0e12;
-            color: #e0e6ed;
-            color-scheme: dark;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+    .container {
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 480px;
+      border: 1px solid var(--border);
+    }
 
-        .container {
-            background: #16181d;
-            padding: 28px;
-            border-radius: 12px;
-            border: 1px solid #2a2e39;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 100%;
-            max-width: 480px;
-        }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      text-align: center;
+    }
 
-        h2 {
-            margin-top: 0;
-            color: #ffffff;
-            text-align: center;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 12px;
-        }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 24px;
+    }
 
-        .info-box {
-            background-color: #1a2332;
-            border-left: 3px solid #00b0ff;
-            padding: 12px 14px;
-            border-radius: 4px;
-            font-size: 13px;
-            color: #90caf9;
-            line-height: 1.4;
-            margin-bottom: 20px;
-        }
+    .form-group {
+      margin-bottom: 16px;
+    }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #c2c9d6;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: #0f172a;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
-        .subtitle-label {
-            font-size: 11px;
-            color: #6b7280;
-            text-transform: none;
-            font-weight: 400;
-        }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
 
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            background-color: #0d0e12;
-            border: 1px solid #2a2e39;
-            border-radius: 6px;
-            color: #ffffff;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
 
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #00b0ff;
-            box-shadow: 0 0 0 2px rgba(0, 176, 255, 0.2);
-        }
+    .honeypot {
+      display: none !important;
+    }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            background-color: #00e676;
-            color: #051e11;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 10px;
-        }
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--primary);
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 10px;
+    }
 
-        button:hover:not(:disabled) {
-            background-color: #00c853;
-            box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
-        }
+    button:hover {
+      background-color: var(--primary-hover);
+    }
 
-        button:disabled {
-            background-color: #2a2e39;
-            color: #6b7280;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-        #status {
-            margin-top: 16px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            min-height: 20px;
-        }
+    .status-box {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+      text-align: center;
+    }
 
-        .success { color: #00e676; }
-        .error { color: #ff5252; }
+    .status-box.success {
+      background-color: rgba(34, 197, 94, 0.15);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
 
-        /* Honeypot field - hidden from human users */
-        .website-field {
-            position: absolute !important;
-            left: -9999px !important;
-            width: 1px !important;
-            height: 1px !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-    </style>
+    .status-box.error {
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--error);
+      color: var(--error);
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-    <h2>Αίτημα για Ραντεβού</h2>
-
-    <div class="info-box">
-        📌 <strong>Σημείωση:</strong>
-        Επιλέξτε την ημερομηνία και ώρα που σας εξυπηρετεί.
-        Μόλις λάβω το αίτημά σας, θα επικοινωνήσω μαζί σας για επιβεβαίωση!
-    </div>
+  <div class="container">
+    <h1>Κράτηση Ραντεβού</h1>
+    <p class="subtitle">Συμπληρώστε τη φόρμα για να αίτημα ραντεβού</p>
 
     <form id="bookingForm">
-        <div class="form-group">
-            <label for="name">Ονοματεπώνυμο *</label>
-            <input type="text" id="name" maxlength="80" autocomplete="name" required placeholder="π.χ. Γιώργος Παπαδόπουλος">
-        </div>
+      <!-- Honeypot -->
+      <input type="text" id="website" name="website" class="honeypot" tabindex="-1" autocomplete="off" />
 
-        <div class="form-group">
-            <label for="phone">
-                Τηλέφωνο Επικοινωνίας
-                <span class="subtitle-label">(Τηλέφωνο ή Instagram)</span>
-            </label>
-            <input type="tel" id="phone" maxlength="30" autocomplete="tel" inputmode="tel" placeholder="π.χ. 6912345678">
-        </div>
+      <div class="form-group">
+        <label for="name">Όνομα / Επώνυμο *</label>
+        <input type="text" id="name" required placeholder="π.χ. Γιώργος Παπαδόπουλος" />
+      </div>
 
-        <div class="form-group">
-            <label for="instagram">
-                Instagram Profile
-                <span class="subtitle-label">(Τηλέφωνο ή Instagram)</span>
-            </label>
-            <input type="text" id="instagram" maxlength="40" autocomplete="off" placeholder="@username">
-        </div>
+      <div class="form-group">
+        <label for="phone">Τηλέφωνο</label>
+        <input type="tel" id="phone" placeholder="π.χ. 6912345678" />
+      </div>
 
-        <div class="form-group">
-            <label for="massageType">Είδος Μασάζ *</label>
-            <select id="massageType" required>
-                <option value="Χαλαρωτικό (Relaxing)">Χαλαρωτικό</option>
-                <option value="Deep Tissue">Deep Tissue</option>
-                <option value="Αθλητικό (Sports)">Αθλητικό</option>
-                <option value="Εστίαση σε τραυματισμό/πόνο">Εστίαση σε τραυματισμό/πόνο</option>
-            </select>
-        </div>
+      <div class="form-group">
+        <label for="instagram">Instagram Username</label>
+        <input type="text" id="instagram" placeholder="π.χ. my_username" />
+      </div>
 
-        <div class="form-group">
-            <label for="service">Διάρκεια Συνεδρίας *</label>
-            <select id="service" required>
-                <option value="60 λεπτά">60 λεπτά</option>
-                <option value="90 λεπτά">90 λεπτά</option>
-                <option value="120 λεπτά">120 λεπτά</option>
-            </select>
-        </div>
+      <div class="form-group">
+        <label for="massageType">Είδος Μασάζ *</label>
+        <select id="massageType" required>
+          <option value="Χαλαρωτικό (Relaxing)">Χαλαρωτικό (Relaxing)</option>
+          <option value="Deep Tissue">Deep Tissue</option>
+          <option value="Αθλητικό (Sports)">Αθλητικό (Sports)</option>
+          <option value="Εστίαση σε τραυματισμό/πόνο">Εστίαση σε τραυματισμό/πόνο</option>
+        </select>
+      </div>
 
-        <div class="form-group">
-            <label for="date">Προτεινόμενη Ημερομηνία *</label>
-            <input type="date" id="date" required>
-        </div>
+      <div class="form-group">
+        <label for="service">Διάρκεια *</label>
+        <select id="service" required>
+          <option value="60 λεπτά">60 λεπτά</option>
+          <option value="90 λεπτά">90 λεπτά</option>
+          <option value="120 λεπτά">120 λεπτά</option>
+        </select>
+      </div>
 
-        <div class="form-group">
-            <label for="timeSlot">Προτεινόμενη Ώρα *</label>
-            <select id="timeSlot" required>
-                <option value="" disabled selected>Επιλέξτε ώρα...</option>
-                <option value="09:00">09:00</option>
-                <option value="09:30">09:30</option>
-                <option value="10:00">10:00</option>
-                <option value="10:30">10:30</option>
-                <option value="11:00">11:00</option>
-                <option value="11:30">11:30</option>
-                <option value="12:00">12:00</option>
-                <option value="12:30">12:30</option>
-                <option value="13:00">13:00</option>
-                <option value="13:30">13:30</option>
-                <option value="14:00">14:00</option>
-                <option value="14:30">14:30</option>
-                <option value="15:00">15:00</option>
-                <option value="15:30">15:30</option>
-                <option value="16:00">16:00</option>
-                <option value="16:30">16:30</option>
-                <option value="17:00">17:00</option>
-                <option value="17:30">17:30</option>
-                <option value="18:00">18:00</option>
-                <option value="18:30">18:30</option>
-                <option value="19:00">19:00</option>
-                <option value="19:30">19:30</option>
-                <option value="20:00">20:00</option>
-                <option value="20:30">20:30</option>
-                <option value="21:00">21:00</option>
-            </select>
-        </div>
+      <div class="form-group">
+        <label for="date">Ημερομηνία *</label>
+        <input type="date" id="date" required />
+      </div>
 
-        <div class="form-group">
-            <label for="notes">Σημειώσεις / Διεύθυνση / Περιοχή</label>
-            <textarea id="notes" rows="3" maxlength="1000" placeholder="π.χ. Διεύθυνση κατ' οίκον, σημεία με ένταση/πόνο, επιθυμητή πίεση..."></textarea>
-        </div>
+      <div class="form-group">
+        <label for="timeSlot">Ώρα *</label>
+        <select id="timeSlot" required>
+          <option value="09:00">09:00</option>
+          <option value="09:30">09:30</option>
+          <option value="10:00">10:00</option>
+          <option value="10:30">10:30</option>
+          <option value="11:00">11:00</option>
+          <option value="11:30">11:30</option>
+          <option value="12:00">12:00</option>
+          <option value="12:30">12:30</option>
+          <option value="13:00">13:00</option>
+          <option value="13:30">13:30</option>
+          <option value="14:00">14:00</option>
+          <option value="14:30">14:30</option>
+          <option value="15:00">15:00</option>
+          <option value="15:30">15:30</option>
+          <option value="16:00">16:00</option>
+          <option value="16:30">16:30</option>
+          <option value="17:00">17:00</option>
+          <option value="17:30">17:30</option>
+          <option value="18:00">18:00</option>
+          <option value="18:30">18:30</option>
+          <option value="19:00">19:00</option>
+          <option value="19:30">19:30</option>
+          <option value="20:00">20:00</option>
+          <option value="20:30">20:30</option>
+          <option value="21:00">21:00</option>
+        </select>
+      </div>
 
-        <!-- Invisible Honeypot -->
-        <input type="text" id="website" name="website" class="website-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="form-group">
+        <label for="notes">Σημειώσεις / Παρατηρήσεις</label>
+        <textarea id="notes" placeholder="Οποιαδήποτε λεπτομέρεια θέλετε να γνωρίζουμε..."></textarea>
+      </div>
 
-        <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
+      <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
     </form>
 
-    <div id="status"></div>
-</div>
+    <div id="statusBox" class="status-box"></div>
+  </div>
 
-<script>
-const WORKER_URL = "https://massage-booking-proxy.tonisdevv.workers.dev";
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WORKER_URL = "https://massage-booking-proxy.tonisdevv.workers.dev";
+      const form = document.getElementById("bookingForm");
+      const statusBox = document.getElementById("statusBox");
+      const submitBtn = document.getElementById("submitBtn");
 
-document.getElementById("bookingForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+      // Set default date to today
+      const dateInput = document.getElementById("date");
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.value = today;
+      dateInput.min = today;
 
-  const statusBox = document.getElementById("statusBox");
-  const submitBtn = document.getElementById("submitBtn");
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-  statusBox.style.display = "none";
-  statusBox.className = "status-box";
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Αποστολή...";
+        statusBox.style.display = "none";
+        statusBox.className = "status-box";
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Αποστολή...";
 
-  const formData = {
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value,
-    instagram: document.getElementById("instagram").value,
-    massageType: document.getElementById("massageType").value,
-    service: document.getElementById("service").value,
-    date: document.getElementById("date").value,
-    timeSlot: document.getElementById("timeSlot").value,
-    notes: document.getElementById("notes").value,
-    website: document.getElementById("website").value // Honeypot
-  };
+        const formData = {
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          instagram: document.getElementById("instagram").value,
+          massageType: document.getElementById("massageType").value,
+          service: document.getElementById("service").value,
+          date: document.getElementById("date").value,
+          timeSlot: document.getElementById("timeSlot").value,
+          notes: document.getElementById("notes").value,
+          website: document.getElementById("website").value
+        };
 
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+        try {
+          const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            statusBox.textContent = "✅ Το αίτημα εστάλη με επιτυχία! Θα επικοινωνήσουμε σύντομα.";
+            statusBox.classList.add("success");
+            statusBox.style.display = "block";
+            form.reset();
+            dateInput.value = today;
+          } else {
+            throw new Error(result.error || `HTTP ${response.status}`);
+          }
+        } catch (err) {
+          console.error("Error:", err);
+          statusBox.textContent = `❌ ${err.message || "Σφάλμα κατά την αποστολή."}`;
+          statusBox.classList.add("error");
+          statusBox.style.display = "block";
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Αποστολή Αιτήματος";
+        }
+      });
     });
-
-    const result = await response.json();
-
-    if (response.ok && result.success) {
-      statusBox.textContent = "✅ Το αίτημα εστάλη με επιτυχία! Θα επικοινωνήσουμε σύντομα.";
-      statusBox.classList.add("success");
-      statusBox.style.display = "block";
-      document.getElementById("bookingForm").reset();
-    } else {
-      throw new Error(result.error || `HTTP error ${response.status}`);
-    }
-  } catch (err) {
-    console.error("Submission Error:", err);
-    statusBox.textContent = `❌ Σφάλμα: ${err.message}`;
-    statusBox.classList.add("error");
-    statusBox.style.display = "block";
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Αποστολή Αιτήματος";
-  }
-});
-</script>
+  </script>
 
 </body>
 </html>
