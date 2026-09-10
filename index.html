@@ -21,12 +21,23 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
         }
         h2 {
             margin-top: 0;
             color: #2c3e50;
             text-align: center;
+            margin-bottom: 10px;
+        }
+        .info-box {
+            background-color: #eef7fc;
+            border-left: 4px solid #3498db;
+            padding: 12px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #2c3e50;
+            line-height: 1.4;
+            margin-bottom: 20px;
         }
         .form-group {
             margin-bottom: 18px;
@@ -36,6 +47,12 @@
             margin-bottom: 6px;
             font-weight: 600;
             color: #34495e;
+            font-size: 14px;
+        }
+        .subtitle-label {
+            font-size: 11px;
+            color: #7f8c8d;
+            font-weight: normal;
         }
         input, textarea, select {
             width: 100%;
@@ -56,6 +73,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
+            margin-top: 10px;
         }
         button:hover {
             background-color: #219150;
@@ -76,7 +94,12 @@
 <body>
 
 <div class="container">
-    <h2>Κράτηση Ραντεβού</h2>
+    <h2>Αίτημα για Ραντεβού</h2>
+    
+    <div class="info-box">
+        📌 <strong>Σημείωση:</strong> Επιλέξτε την ημερομηνία και ώρα που σας εξυπηρετεί καλύτερα. Μόλις λάβω το αίτημά σας, θα επικοινωνήσω μαζί σας το συντομότερο για την επιβεβαίωση της διαθεσιμότητας!
+    </div>
+
     <form id="bookingForm">
         <div class="form-group">
             <label for="name">Ονοματεπώνυμο *</label>
@@ -84,23 +107,37 @@
         </div>
 
         <div class="form-group">
-            <label for="contact">Τηλέφωνο / Email *</label>
-            <input type="text" id="contact" required placeholder="69XXXXXXXX">
+            <label for="phone">Τηλέφωνο Επικοινωνίας <span class="subtitle-label">(Απαιτείται Τηλέφωνο ή Instagram)</span></label>
+            <input type="tel" id="phone" placeholder="π.χ. 6912345678">
         </div>
 
         <div class="form-group">
-            <label for="date">Ημερομηνία *</label>
+            <label for="instagram">Instagram Profile <span class="subtitle-label">(Απαιτείται Τηλέφωνο ή Instagram)</span></label>
+            <input type="text" id="instagram" placeholder="@username">
+        </div>
+
+        <div class="form-group">
+            <label for="service">Διάρκεια / Είδος Συνεδρίας *</label>
+            <select id="service" required>
+                <option value="60 λεπτά">60 λεπτά</option>
+                <option value="90 λεπτά">90 λεπτά</option>
+                <option value="120 λεπτά">120 λεπτά</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="date">Προτεινόμενη Ημερομηνία *</label>
             <input type="date" id="date" required>
         </div>
 
         <div class="form-group">
-            <label for="time">Ώρα *</label>
+            <label for="time">Προτεινόμενη Ώρα *</label>
             <input type="time" id="time" required>
         </div>
 
         <div class="form-group">
-            <label for="notes">Σημειώσεις / Διεύθυνση</label>
-            <textarea id="notes" rows="3" placeholder="Επιπλέον πληροφορίες..."></textarea>
+            <label for="notes">Σημειώσεις / Διεύθυνση / Περιοχή</label>
+            <textarea id="notes" rows="3" placeholder="π.χ. Διεύθυνση για κατ' οίκον, τυχόν τραυματισμοί ή προτιμήσεις..."></textarea>
         </div>
 
         <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
@@ -111,7 +148,7 @@
 <script>
     const WORKER_URL = 'https://massage-booking-proxy.tonisdevv.workers.dev/';
 
-    // Prevent past dates from being selected
+    // Απαγόρευση επιλογής περασμένων ημερομηνιών
     document.getElementById('date').min = new Date().toISOString().split('T')[0];
 
     document.getElementById('bookingForm').addEventListener('submit', async function(e) {
@@ -119,19 +156,51 @@
         
         const btn = document.getElementById('submitBtn');
         const status = document.getElementById('status');
+        
+        const phone = document.getElementById('phone').value.trim();
+        let instagram = document.getElementById('instagram').value.trim();
+
+        // 1. Έλεγχος ότι τουλάχιστον ένα από τα δύο έχει συμπληρωθεί
+        if (!phone && !instagram) {
+            status.className = "error";
+            status.innerText = "❌ Παρακαλώ συμπληρώστε τουλάχιστον ένα μέσο επικοινωνίας (Τηλέφωνο ή Instagram).";
+            return;
+        }
+
+        // 2. Validation Τηλεφώνου (αν έχει συμπληρωθεί)
+        if (phone) {
+            // Καθαρισμός από κενά ή παύλες
+            const cleanPhone = phone.replace(/[\s\-]/g, '');
+            // Έλεγχος αν αποτελείται από 10 ψηφία και ξεκινάει από 69 ή 2
+            const phoneRegex = /^(69|2)\d{8}$/;
+            
+            if (!phoneRegex.test(cleanPhone)) {
+                status.className = "error";
+                status.innerText = "❌ Παρακαλώ εισάγετε ένα έγκυρο ελληνικό τηλέφωνο (10 ψηφία).";
+                return;
+            }
+        }
+
         btn.disabled = true;
         btn.innerText = "Αποστολή...";
         status.innerText = "";
 
         const name = document.getElementById('name').value;
-        const contact = document.getElementById('contact').value;
+        const service = document.getElementById('service').value;
         const date = document.getElementById('date').value;
         const time = document.getElementById('time').value;
         const notes = document.getElementById('notes').value || "Καμία";
 
+        // Μορφοποίηση Instagram
+        if (instagram && !instagram.startsWith('@')) {
+            instagram = '@' + instagram;
+        }
+
         const formattedMessage = `🔔 *ΝΕΟ ΑΙΤΗΜΑ ΡΑΝΤΕΒΟΥ*\n\n` +
                                 `👤 *Όνομα:* ${name}\n` +
-                                `📞 *Επικοινωνία:* ${contact}\n` +
+                                `📞 *Τηλέφωνο:* ${phone || "Δεν δόθηκε"}\n` +
+                                `📸 *Instagram:* ${instagram || "Δεν δόθηκε"}\n` +
+                                `⏱ *Διάρκεια:* ${service}\n` +
                                 `📅 *Ημερομηνία:* ${date}\n` +
                                 `⏰ *Ώρα:* ${time}\n` +
                                 `📝 *Σημειώσεις:* ${notes}`;
@@ -147,7 +216,7 @@
 
             if (response.ok && resData.success) {
                 status.className = "success";
-                status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα.";
+                status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα για την επιβεβαίωση.";
                 document.getElementById('bookingForm').reset();
             } else {
                 throw new Error();
