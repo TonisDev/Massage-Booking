@@ -1,22 +1,40 @@
+```html
 <!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Κράτηση Ραντεβού Massage</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Cloudflare Turnstile -->
+    <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer>
+    </script>
+
     <style>
         * {
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter',
+                -apple-system,
+                BlinkMacSystemFont,
+                sans-serif;
         }
 
         body {
             background-color: #0d0e12;
             color: #e0e6ed;
-            color-scheme: dark; /* Διορθώθηκε: Μπήκε σωστά εντός του body */
+            color-scheme: dark;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -77,7 +95,9 @@
             font-weight: 400;
         }
 
-        input, textarea, select {
+        input,
+        textarea,
+        select {
             width: 100%;
             padding: 12px;
             background-color: #0d0e12;
@@ -88,7 +108,9 @@
             transition: all 0.2s ease;
         }
 
-        input:focus, textarea:focus, select:focus {
+        input:focus,
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: #00b0ff;
             box-shadow: 0 0 0 2px rgba(0, 176, 255, 0.2);
@@ -110,7 +132,7 @@
             margin-top: 10px;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background-color: #00c853;
             box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
         }
@@ -127,65 +149,167 @@
             text-align: center;
             font-weight: 600;
             font-size: 14px;
+            min-height: 20px;
         }
 
-        .success { color: #00e676; }
-        .error { color: #ff5252; }
+        .success {
+            color: #00e676;
+        }
+
+        .error {
+            color: #ff5252;
+        }
+
+        /* Honeypot - invisible to normal users */
+        .website-field {
+            position: absolute !important;
+            left: -9999px !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        .turnstile-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
+
 <body>
 
 <div class="container">
+
     <h2>Αίτημα για Ραντεβού</h2>
-    
+
     <div class="info-box">
-        📌 <strong>Σημείωση:</strong> Επιλέξτε την ημερομηνία και ώρα που σας εξυπηρετεί. Μόλις λάβω το αίτημά σας, θα επικοινωνήσω μαζί σας για επιβεβαίωση!
+        📌 <strong>Σημείωση:</strong>
+        Επιλέξτε την ημερομηνία και ώρα που σας εξυπηρετεί.
+        Μόλις λάβω το αίτημά σας, θα επικοινωνήσω μαζί σας για επιβεβαίωση!
     </div>
 
     <form id="bookingForm">
+
         <div class="form-group">
-            <label for="name">Ονοματεπώνυμο *</label>
-            <input type="text" id="name" required placeholder="π.χ. Γιώργος Παπαδόπουλος">
+            <label for="name">
+                Ονοματεπώνυμο *
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                maxlength="80"
+                autocomplete="name"
+                required
+                placeholder="π.χ. Γιώργος Παπαδόπουλος"
+            >
         </div>
 
         <div class="form-group">
-            <label for="phone">Τηλέφωνο Επικοινωνίας <span class="subtitle-label">(Τηλέφωνο ή Instagram)</span></label>
-            <input type="tel" id="phone" placeholder="π.χ. 6912345678">
+            <label for="phone">
+                Τηλέφωνο Επικοινωνίας
+                <span class="subtitle-label">
+                    (Τηλέφωνο ή Instagram)
+                </span>
+            </label>
+
+            <input
+                type="tel"
+                id="phone"
+                maxlength="30"
+                autocomplete="tel"
+                inputmode="tel"
+                placeholder="π.χ. 6912345678"
+            >
         </div>
 
         <div class="form-group">
-            <label for="instagram">Instagram Profile <span class="subtitle-label">(Τηλέφωνο ή Instagram)</span></label>
-            <input type="text" id="instagram" placeholder="@username">
+            <label for="instagram">
+                Instagram Profile
+                <span class="subtitle-label">
+                    (Τηλέφωνο ή Instagram)
+                </span>
+            </label>
+
+            <input
+                type="text"
+                id="instagram"
+                maxlength="40"
+                autocomplete="off"
+                placeholder="@username"
+            >
         </div>
 
         <div class="form-group">
-            <label for="massageType">Είδος Μασάζ *</label>
+            <label for="massageType">
+                Είδος Μασάζ *
+            </label>
+
             <select id="massageType" required>
-                <option value="Χαλαρωτικό (Relaxing)">Χαλαρωτικό</option>
-                <option value="Deep Tissue">Deep Tissue</option>
-                <option value="Αθλητικό (Sports)">Αθλητικό</option>
-                <option value="Συνδυαστικό / Mix">Εστίαση σε τραυματισμό/πόνο</option>
+                <option value="Χαλαρωτικό (Relaxing)">
+                    Χαλαρωτικό
+                </option>
+
+                <option value="Deep Tissue">
+                    Deep Tissue
+                </option>
+
+                <option value="Αθλητικό (Sports)">
+                    Αθλητικό
+                </option>
+
+                <option value="Συνδυαστικό / Mix">
+                    Εστίαση σε τραυματισμό/πόνο
+                </option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="service">Διάρκεια Συνεδρίας *</label>
+            <label for="service">
+                Διάρκεια Συνεδρίας *
+            </label>
+
             <select id="service" required>
-                <option value="60 λεπτά">60 λεπτά</option>
-                <option value="90 λεπτά">90 λεπτά</option>
-                <option value="120 λεπτά">120 λεπτά</option>
+                <option value="60 λεπτά">
+                    60 λεπτά
+                </option>
+
+                <option value="90 λεπτά">
+                    90 λεπτά
+                </option>
+
+                <option value="120 λεπτά">
+                    120 λεπτά
+                </option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="date">Προτεινόμενη Ημερομηνία *</label>
-            <input type="date" id="date" required>
+            <label for="date">
+                Προτεινόμενη Ημερομηνία *
+            </label>
+
+            <input
+                type="date"
+                id="date"
+                required
+            >
         </div>
 
         <div class="form-group">
-            <label for="timeSlot">Προτεινόμενη Ώρα *</label>
+            <label for="timeSlot">
+                Προτεινόμενη Ώρα *
+            </label>
+
             <select id="timeSlot" required>
-                <option value="" disabled selected>Επιλέξτε ώρα...</option>
+
+                <option value="" disabled selected>
+                    Επιλέξτε ώρα...
+                </option>
+
                 <option value="09:00">09:00</option>
                 <option value="09:30">09:30</option>
                 <option value="10:00">10:00</option>
@@ -211,117 +335,361 @@
                 <option value="20:00">20:00</option>
                 <option value="20:30">20:30</option>
                 <option value="21:00">21:00</option>
+
             </select>
         </div>
 
         <div class="form-group">
-            <label for="notes">Σημειώσεις / Διεύθυνση / Περιοχή</label>
-            <textarea id="notes" rows="3" placeholder="π.χ. Διεύθυνση κατ' οίκον, σημεία με ένταση/πόνο, επιθυμητή πίεση..."></textarea>
+            <label for="notes">
+                Σημειώσεις / Διεύθυνση / Περιοχή
+            </label>
+
+            <textarea
+                id="notes"
+                rows="3"
+                maxlength="1000"
+                placeholder="π.χ. Διεύθυνση κατ' οίκον, σημεία με ένταση/πόνο, επιθυμητή πίεση..."
+            ></textarea>
         </div>
 
-        <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
+        <!-- Honeypot -->
+        <input
+            type="text"
+            id="website"
+            name="website"
+            class="website-field"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+        >
+
+        <!-- Cloudflare Turnstile -->
+        <div class="turnstile-container">
+
+            <div
+                class="cf-turnstile"
+                data-sitekey="ΒΑΛΕ_ΕΔΩ_ΤΟ_TURNSTILE_SITE_KEY"
+                data-theme="dark"
+                data-size="normal">
+            </div>
+
+        </div>
+
+        <button
+            type="submit"
+            id="submitBtn">
+            Αποστολή Αιτήματος
+        </button>
+
     </form>
+
     <div id="status"></div>
+
 </div>
 
 <script>
-const WORKER_URL = 'https://massage-booking-proxy.tonisdevv.workers.dev/';
 
-// Αυτόματο κλείδωμα περασμένων ημερομηνιών
-const today = new Date().toISOString().split('T')[0];
-const dateInput = document.getElementById('date');
+const WORKER_URL =
+    "https://massage-booking-proxy.tonisdevv.workers.dev/";
+
+
+/*
+ * Get today's date in Greece.
+ * We don't use toISOString() because it uses UTC.
+ */
+function getTodayAthens() {
+
+    const formatter = new Intl.DateTimeFormat(
+        "en-CA",
+        {
+            timeZone: "Europe/Athens",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }
+    );
+
+    return formatter.format(new Date());
+}
+
+
+const dateInput = document.getElementById("date");
+
+const today = getTodayAthens();
+
 dateInput.min = today;
 dateInput.value = today;
 
-// Συνάρτηση καθαρισμού ειδικών χαρακτήρων Markdown
-function cleanMarkdown(text) {
-    return text.replace(/[*_`\[\]()~>#+-=|{}.!]/g, ' ');
+
+/*
+ * Basic client-side cleanup.
+ * The Worker performs the real validation.
+ */
+function cleanText(value, maxLength) {
+
+    return String(value || "")
+        .replace(/[\u0000-\u001F\u007F]/g, "")
+        .trim()
+        .slice(0, maxLength);
 }
 
-document.getElementById('bookingForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const btn = document.getElementById('submitBtn');
-    const status = document.getElementById('status');
-    
-    const rawPhone = document.getElementById('phone').value.trim();
-    let instagram = document.getElementById('instagram').value.trim();
 
-    if (!rawPhone && !instagram) {
-        status.className = "error";
-        status.innerText = "❌ Παρακαλώ συμπληρώστε τουλάχιστον ένα μέσο επικοινωνίας (Τηλέφωνο ή Instagram).";
-        return;
-    }
+/*
+ * Submit form
+ */
+document
+    .getElementById("bookingForm")
+    .addEventListener("submit", async function(e) {
 
-    let phone = "";
-    if (rawPhone) {
-        // Καθαρισμός όλων των μη ψηφιακών χαρακτήρων
-        const digitsOnly = rawPhone.replace(/\D/g, '');
-        // Αφαίρεση του 30 από την αρχή αν υπάρχει (π.χ. 3069... -> 69...)
-        phone = digitsOnly.startsWith('30') ? digitsOnly.slice(2) : digitsOnly;
-        
-        const phoneRegex = /^(69|2)\d{8}$/;
-        if (!phoneRegex.test(phone)) {
+        e.preventDefault();
+
+        const btn =
+            document.getElementById("submitBtn");
+
+        const status =
+            document.getElementById("status");
+
+        const form =
+            document.getElementById("bookingForm");
+
+
+        /*
+         * Get Turnstile token
+         */
+        const turnstileToken =
+            typeof turnstile !== "undefined"
+                ? turnstile.getResponse()
+                : "";
+
+
+        if (!turnstileToken) {
+
             status.className = "error";
-            status.innerText = "❌ Παρακαλώ εισάγετε ένα έγκυρο ελληνικό τηλέφωνο (10 ψηφία).";
+
+            status.innerText =
+                "❌ Παρακαλώ ολοκληρώστε τον έλεγχο ασφαλείας.";
+
             return;
         }
-    }
 
-    btn.disabled = true;
-    btn.innerText = "Αποστολή...";
-    status.innerText = "";
 
-    // Καθαρισμός εισόδων από επικίνδυνους χαρακτήρες Markdown
-    const name = cleanMarkdown(document.getElementById('name').value.trim());
-    const massageType = document.getElementById('massageType').value;
-    const service = document.getElementById('service').value;
-    const rawDate = dateInput.value;
-    const [year, month, day] = rawDate.split('-');
-    const formattedDate = `${day}/${month}/${year}`;
-    
-    const timeSlot = document.getElementById('timeSlot').value;
-    const notes = cleanMarkdown(document.getElementById('notes').value.trim()) || "Καμία";
+        /*
+         * Read fields
+         */
+        const name =
+            cleanText(
+                document.getElementById("name").value,
+                80
+            );
 
-    if (instagram) {
-        instagram = cleanMarkdown(instagram);
-        if (!instagram.startsWith('@')) instagram = '@' + instagram;
-    }
+        const phone =
+            cleanText(
+                document.getElementById("phone").value,
+                30
+            );
 
-    const formattedMessage = `🔔 *ΝΕΟ ΑΙΤΗΜΑ ΡΑΝΤΕΒΟΥ*\n\n` +
-                            `👤 *Όνομα:* ${name}\n` +
-                            `📞 *Τηλέφωνο:* ${phone || "Δεν δόθηκε"}\n` +
-                            `📸 *Instagram:* ${instagram || "Δεν δόθηκε"}\n` +
-                            `💆‍♂️ *Είδος:* ${massageType}\n` +
-                            `⏱ *Διάρκεια:* ${service}\n` +
-                            `📅 *Ημερομηνία:* ${formattedDate}\n` +
-                            `⏰ *Ώρα:* ${timeSlot}\n` +
-                            `📝 *Σημειώσεις:* ${notes}`;
+        let instagram =
+            cleanText(
+                document.getElementById("instagram").value,
+                40
+            );
 
-    try {
-        const response = await fetch(WORKER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: formattedMessage })
-        });
+        const massageType =
+            document.getElementById("massageType").value;
 
-        const resData = await response.json();
+        const service =
+            document.getElementById("service").value;
 
-        if (response.ok && resData.success) {
-            status.className = "success";
-            status.innerText = "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα.";
-            document.getElementById('bookingForm').reset();
-            dateInput.value = today;
-        } else {
-            throw new Error(resData.error || "Server error");
+        const date =
+            document.getElementById("date").value;
+
+        const timeSlot =
+            document.getElementById("timeSlot").value;
+
+        const notes =
+            cleanText(
+                document.getElementById("notes").value,
+                1000
+            );
+
+        const website =
+            cleanText(
+                document.getElementById("website").value,
+                100
+            );
+
+
+        /*
+         * At least one contact method
+         */
+        if (!phone && !instagram) {
+
+            status.className = "error";
+
+            status.innerText =
+                "❌ Παρακαλώ συμπληρώστε τουλάχιστον ένα μέσο επικοινωνίας (Τηλέφωνο ή Instagram).";
+
+            return;
         }
-    } catch (err) {
-        status.className = "error";
-        status.innerText = "❌ Υπήρξε σφάλμα κατά την αποστολή. Δοκιμάστε ξανά.";
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "Αποστολή Αιτήματος";
-    }
-});
 
 
+        /*
+         * Client-side phone check
+         */
+        if (phone) {
+
+            let digits =
+                phone.replace(/\D/g, "");
+
+            if (digits.startsWith("30")) {
+                digits = digits.slice(2);
+            }
+
+            if (!/^(69|2)\d{8}$/.test(digits)) {
+
+                status.className = "error";
+
+                status.innerText =
+                    "❌ Παρακαλώ εισάγετε ένα έγκυρο ελληνικό τηλέφωνο.";
+
+                return;
+            }
+        }
+
+
+        /*
+         * Instagram normalization
+         */
+        if (instagram) {
+
+            instagram =
+                instagram
+                    .replace(/\s/g, "")
+                    .replace(/^@+/, "");
+
+            instagram = "@" + instagram;
+        }
+
+
+        /*
+         * Lock button
+         */
+        btn.disabled = true;
+
+        btn.innerText = "Αποστολή...";
+
+        status.className = "";
+
+        status.innerText = "";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    WORKER_URL,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            name,
+                            phone,
+                            instagram,
+                            massageType,
+                            service,
+                            date,
+                            timeSlot,
+                            notes,
+                            website,
+                            turnstileToken
+
+                        })
+                    }
+                );
+
+
+            let result;
+
+            try {
+                result = await response.json();
+            } catch {
+                result = {};
+            }
+
+
+            if (
+                response.ok &&
+                result.success === true
+            ) {
+
+                status.className = "success";
+
+                status.innerText =
+                    "✓ Το αίτημα στάλθηκε επιτυχώς! Θα επικοινωνήσω μαζί σας σύντομα.";
+
+                form.reset();
+
+                dateInput.min =
+                    getTodayAthens();
+
+                dateInput.value =
+                    getTodayAthens();
+
+
+                /*
+                 * Reset Turnstile
+                 */
+                if (
+                    typeof turnstile !== "undefined"
+                ) {
+                    turnstile.reset();
+                }
+
+            } else {
+
+                throw new Error(
+                    "Request failed"
+                );
+            }
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            status.className = "error";
+
+            status.innerText =
+                "❌ Υπήρξε σφάλμα κατά την αποστολή. Δοκιμάστε ξανά.";
+
+            /*
+             * Reset Turnstile because
+             * the token is one-time use.
+             */
+            if (
+                typeof turnstile !== "undefined"
+            ) {
+                turnstile.reset();
+            }
+
+        } finally {
+
+            btn.disabled = false;
+
+            btn.innerText =
+                "Αποστολή Αιτήματος";
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
+```
