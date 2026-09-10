@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
         * {
             box-sizing: border-box;
@@ -17,6 +16,7 @@
         body {
             background-color: #0d0e12;
             color: #e0e6ed;
+            color-scheme: dark; /* Διορθώθηκε: Μπήκε σωστά εντός του body */
             margin: 0;
             padding: 20px;
             display: flex;
@@ -93,8 +93,6 @@
             border-color: #00b0ff;
             box-shadow: 0 0 0 2px rgba(0, 176, 255, 0.2);
         }
-
-        color-scheme: dark;
 
         button {
             width: 100%;
@@ -179,13 +177,11 @@
             </select>
         </div>
 
-        <!-- 1. Native Date Picker (Φουλ εύχρηστο σε κινητά) -->
         <div class="form-group">
             <label for="date">Προτεινόμενη Ημερομηνία *</label>
             <input type="date" id="date" required>
         </div>
 
-        <!-- 2. Dropdown Ώρας με ημ Both (π.χ. 10:00, 10:30) -->
         <div class="form-group">
             <label for="timeSlot">Προτεινόμενη Ώρα *</label>
             <select id="timeSlot" required>
@@ -231,11 +227,11 @@
 <script>
     const WORKER_URL = 'https://massage-booking-proxy.tonisdevv.workers.dev/';
 
-    // Αυτόματο κλείδωμα περασμένων ημερομηνιών (με βάση τη σημερινή μέρα)
+    // Αυτόματο κλείδωμα περασμένων ημερομηνιών
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('date');
     dateInput.min = today;
-    dateInput.value = today; // Προεπιλογή η σημερινή μέρα
+    dateInput.value = today;
 
     document.getElementById('bookingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -253,7 +249,8 @@
         }
 
         if (phone) {
-            const cleanPhone = phone.replace(/[\s\-]/g, '');
+            // Καθαρισμός κενών, παυλών και πρόθεματος +30 / 0030
+            const cleanPhone = phone.replace(/[\s\-\+]/g, '').replace(/^30/, '');
             const phoneRegex = /^(69|2)\d{8}$/;
             
             if (!phoneRegex.test(cleanPhone)) {
@@ -267,15 +264,15 @@
         btn.innerText = "Αποστολή...";
         status.innerText = "";
 
-        const name = document.getElementById('name').value;
+        const name = document.getElementById('name').value.trim();
         const massageType = document.getElementById('massageType').value;
         const service = document.getElementById('service').value;
-        const rawDate = dateInput.value; // Formatted YYYY-MM-DD
+        const rawDate = dateInput.value;
         const [year, month, day] = rawDate.split('-');
         const formattedDate = `${day}/${month}/${year}`;
         
         const timeSlot = document.getElementById('timeSlot').value;
-        const notes = document.getElementById('notes').value || "Καμία";
+        const notes = document.getElementById('notes').value.trim() || "Καμία";
 
         if (instagram && !instagram.startsWith('@')) {
             instagram = '@' + instagram;
