@@ -230,6 +230,14 @@
     const submitBtn = document.getElementById('submit-btn');
     const messageBox = document.getElementById('message-box');
 
+    // 💥 ΠΡΟΣΘΗΚΗ: Συνάρτηση εμφανισης μηνυμάτων 💥
+    function showMessage(text, type) {
+        if (!messageBox) return;
+        messageBox.textContent = text;
+        messageBox.className = type; // e.g. 'msg-success' or 'msg-error'
+        messageBox.style.display = 'block';
+    }
+
     // 1. Αρχικοποίηση Flatpickr Calendar
     const fp = flatpickr(dateInput, {
         locale: 'gr',
@@ -327,6 +335,8 @@ form.addEventListener('submit', async (e) => {
     const submitBtn = document.getElementById('submit-btn');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Υποβολή...';
+    
+    // Κρύβουμε το message-box κατά την έναρξη της υποβολής
     messageBox.style.display = 'none';
 
     const payload = {
@@ -341,7 +351,7 @@ form.addEventListener('submit', async (e) => {
         website: document.getElementById('website').value
     };
 
-   try {
+    try {
         const response = await fetch(`${WORKER_URL}/api/bookings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -350,7 +360,6 @@ form.addEventListener('submit', async (e) => {
 
         const data = await response.json();
 
-        // Ελέγχουμε είτε το response.ok είτε το data.success
         if (response.ok) {
             const successMsg = data.message || 'Το αίτημα κράτησης υποβλήθηκε με επιτυχία! Θα επικοινωνήσουμε μαζί σας σύντομα.';
             showMessage(`✅ ${successMsg}`, 'msg-success');
