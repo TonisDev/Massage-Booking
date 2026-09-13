@@ -341,7 +341,7 @@ form.addEventListener('submit', async (e) => {
         website: document.getElementById('website').value
     };
 
-    try {
+   try {
         const response = await fetch(`${WORKER_URL}/api/bookings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -350,10 +350,10 @@ form.addEventListener('submit', async (e) => {
 
         const data = await response.json();
 
-        if (response.ok && (data.success || data.message)) {
-            // Εμφάνιση καθαρού μηνύματος επιτυχίας
-            const msg = data.message || 'Το αίτημα κράτησης υποβλήθηκε με επιτυχία! Θα επικοινωνήσουμε μαζί σας σύντομα.';
-            showMessage(`✅ ${msg}`, 'msg-success');
+        // Ελέγχουμε είτε το response.ok είτε το data.success
+        if (response.ok) {
+            const successMsg = data.message || 'Το αίτημα κράτησης υποβλήθηκε με επιτυχία! Θα επικοινωνήσουμε μαζί σας σύντομα.';
+            showMessage(`✅ ${successMsg}`, 'msg-success');
             
             form.reset();
             timeSelect.disabled = true;
