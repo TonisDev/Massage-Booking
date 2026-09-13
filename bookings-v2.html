@@ -316,62 +316,59 @@
     }
 
 // 4. Form Submit Handler
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // Anti-bot check
-        if (document.getElementById('website').value !== '') {
-            return;
-        }
-
-        const submitBtn = document.getElementById('submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Υποβολή...';
-        messageBox.style.display = 'none';
-
-        const payload = {
-            name: document.getElementById('name').value,
-            phone: document.getElementById('phone').value,
-            instagram: document.getElementById('instagram').value,
-            massage_type: document.getElementById('massage_type').value,
-            duration: document.getElementById('duration').value,
-            date: document.getElementById('date').value,
-            time: document.getElementById('time').value,
-            notes: document.getElementById('notes').value,
-            website: document.getElementById('website').value
-        };
-
-        try {
-            const response = await fetch(`${WORKER_URL}/api/bookings`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.success) {
-                showMessage(data.message, 'msg-success');
-                form.reset();
-                timeSelect.disabled = true;
-                timeSelect.innerHTML = '<option value="">-- Επιλέξτε πρώτα Ημερομηνία --</option>';
-            } else {
-                showMessage(data.error || 'Αποτυχία υποβολής αιτήματος', 'msg-error');
-            }
-        } catch (err) {
-            console.error('Submit Error:', err);
-            showMessage('Πρόκληθηκε σφάλμα δικτύου. Παρακαλώ δοκιμάστε ξανά.', 'msg-error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Υποβολή Αιτήματος';
-        }
-    });
-
-    function showMessage(msg, className) {
-        messageBox.className = className;
-        messageBox.textContent = msg;
-        messageBox.style.display = 'block';
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Anti-bot check
+    if (document.getElementById('website').value !== '') {
+        return;
     }
+
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Υποβολή...';
+    messageBox.style.display = 'none';
+
+    const payload = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        instagram: document.getElementById('instagram').value,
+        massage_type: document.getElementById('massage_type').value,
+        duration: document.getElementById('duration').value,
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value,
+        notes: document.getElementById('notes').value,
+        website: document.getElementById('website').value
+    };
+
+    try {
+        const response = await fetch(`${WORKER_URL}/api/bookings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && (data.success || data.message)) {
+            // Εμφάνιση καθαρού μηνύματος επιτυχίας
+            const msg = data.message || 'Το αίτημα κράτησης υποβλήθηκε με επιτυχία! Θα επικοινωνήσουμε μαζί σας σύντομα.';
+            showMessage(`✅ ${msg}`, 'msg-success');
+            
+            form.reset();
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">-- Επιλέξτε πρώτα Ημερομηνία --</option>';
+        } else {
+            showMessage(`❌ ${data.error || 'Αποτυχία υποβολής αιτήματος'}`, 'msg-error');
+        }
+    } catch (err) {
+        console.error('Submit Error:', err);
+        showMessage('❌ Προκλήθηκε σφάλμα δικτύου. Παρακαλώ δοκιμάστε ξανά.', 'msg-error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Υποβολή Αιτήματος';
+    }
+});
 </script>
 
 </body>
