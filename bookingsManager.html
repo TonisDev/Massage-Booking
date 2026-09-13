@@ -229,175 +229,230 @@
       </div>
     </div>
   </div>
+<script>
+const WORKER_URL = "https://general-bookings.tonisdevv.workers.dev";
+let ADMIN_KEY = localStorage.getItem('ADMIN_KEY') || '';
+let calendar;
+let selectedEventId = null;
 
-  <script>
-    const WORKER_URL = "https://general-bookings.tonisdevv.workers.dev";
-    let ADMIN_KEY = localStorage.getItem('ADMIN_KEY') || '';
-    let calendar;
-    let selectedEventId = null;
+document.addEventListener('DOMContentLoaded', async () => {
+  lucide.createIcons();
+  
+  // Αν υπάρχει αποθηκευμένο key, κάνουμε πρώτα σιωπηλό έλεγχο εγκυρότητας
+  if (ADMIN_KEY) {
+    const isValid = await validateAdminKey(ADMIN_KEY);
+    if (isValid) {
+      showDashboard();
+    } else {
+      // Αν το αποθηκευμένο key δεν ισχύει πλέον, το διαγράφουμε
+      localStorage.removeItem('ADMIN_KEY');
+      ADMIN_KEY = '';
+      showLogin();
+    }
+  } else {
+    showLogin();
+  }
+});
 
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      if (ADMIN_KEY) {
-        document.getElementById('loginOverlay').style.display = 'none';
-        initCalendar();
-        fetchAppointments();
-      }
+// Επαλήθευση του Admin Key με ένα γρήγορο αίτημα στον Worker
+async function validateAdminKey(key) {
+  try {
+    const res = await fetch(`${WORKER_URL}/api/admin/appointments`, {
+      headers: { 'X-Admin-Key': key }
+    });
+    return res.status !== 401;
+  } catch (err) {
+    console.error('Validation error:', err);
+    return false;
+  }
+}
+
+// Ενέργεια κατά το πατημα του "Είσοδος" στη φόρμα Login
+async function saveAdminKey() {
+  const inputEl = document.getElementById('adminKeyInput');
+  const val = inputEl.value.trim();
+  
+  if (!val) {
+    alert('Παρακαλώ εισάγετε κωδικό πρόσβασης.');
+    return;
+  }
+
+  // Έλεγχος του κωδικού ΠΡΙΝ ανοίξουμε το dashboard
+  const isValid = await validateAdminKey(val);
+
+  if (isValid) {
+    localStorage.setItem('ADMIN_KEY', val);
+    ADMIN_KEY = val;
+    showDashboard();
+  } else {
+    alert('❌ Λάθος κωδικός πρόσβασης! Η πρόσβαση απορρίφθηκε.');
+    inputEl.value = '';
+    inputEl.focus();
+  }
+}
+
+function showLogin() {
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.querySelector('header').style.display = 'none';
+  document.querySelector('main').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.querySelector('header').style.display = 'flex';
+  document.querySelector('main').style.display = 'block';
+  
+  if (!calendar) {
+    initCalendar();
+  }
+  fetchAppointments();
+}
+
+function logout() {
+  localStorage.removeItem('ADMIN_KEY');
+  location.reload();
+}
+
+async function adminFetch(endpoint, options = {}) {
+  const res = await fetch(`${WORKER_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': ADMIN_KEY,
+      ...(options.headers || {})
+    }
+  });
+  
+  if (res.status === 401) {
+    alert('Η συνεδρία έληξε ή ο κωδικός είναι άκυρος.');
+    logout();
+    throw new Error('Unauthorized');
+  }
+  return res;
+}
+
+function initCalendar() {
+  const calendarEl = document.getElementById('calendar');
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'timeGridWeek',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    buttonText: { today: 'Σήμερα', month: 'Μήνας', week: 'Εβδομάδα', day: 'Ημέρα' },
+    locale: 'el',
+    slotMinTime: '08:00:00',
+    slotMaxTime: '22:00:00',
+    eventClick: (info) => openActionModal(info.event)
+  });
+  calendar.render();
+}
+
+async function fetchAppointments() {
+  try {
+    const res = await adminFetch('/api/admin/appointments');
+    const data = await res.json();
+    
+    let pending = 0, booked = 0;
+    calendar.removeAllEvents();
+
+    data.forEach(item => {
+      if (item.status === 'PENDING') pending++;
+      if (item.status === 'BOOKED') booked++;
+
+      let color = '#3b82f6';
+      if (item.status === 'PENDING') color = '#f59e0b';
+      if (item.status === 'BLOCKED') color = '#64748b';
+      if (item.status === 'REJECTED') color = '#ef4444';
+
+      calendar.addEvent({
+        id: item.id,
+        title: `${item.customer_name} (${item.massage_type})`,
+        start: `${item.date}T${item.start_time}`,
+        end: `${item.date}T${item.end_time}`,
+        backgroundColor: color,
+        extendedProps: item
+      });
     });
 
-    function saveAdminKey() {
-      const val = document.getElementById('adminKeyInput').value.trim();
-      if (val) {
-        localStorage.setItem('ADMIN_KEY', val);
-        ADMIN_KEY = val;
-        document.getElementById('loginOverlay').style.display = 'none';
-        initCalendar();
-        fetchAppointments();
-      }
-    }
+    document.getElementById('statTotal').innerText = data.length;
+    document.getElementById('statPending').innerText = pending;
+    document.getElementById('statBooked').innerText = booked;
+  } catch (e) { console.error(e); }
+}
 
-    function logout() {
-      localStorage.removeItem('ADMIN_KEY');
-      location.reload();
-    }
+function openActionModal(event) {
+  selectedEventId = event.id;
+  const props = event.extendedProps;
+  document.getElementById('actTitle').innerText = props.customer_name;
+  document.getElementById('actDetails').innerHTML = `
+    <p><strong>Τηλέφωνο:</strong> ${props.customer_phone || '-'}</p>
+    <p><strong>Υπηρεσία:</strong> ${props.massage_type}</p>
+    <p><strong>Ώρα:</strong> ${props.start_time} - ${props.end_time}</p>
+    <p><strong>Κατάσταση:</strong> ${props.status}</p>
+  `;
+  document.getElementById('btnApprove').style.display = props.status === 'BLOCKED' ? 'none' : 'inline-flex';
+  openModal('actionModal');
+}
 
-    async function adminFetch(endpoint, options = {}) {
-      const res = await fetch(`${WORKER_URL}${endpoint}`, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Admin-Key': ADMIN_KEY,
-          ...(options.headers || {})
-        }
-      });
-      if (res.status === 401) {
-        alert('Λάθος Admin Key!');
-        logout();
-        throw new Error('Unauthorized');
-      }
-      return res;
-    }
+async function updateStatus(status) {
+  await adminFetch('/api/admin/update-status', {
+    method: 'POST',
+    body: JSON.stringify({ id: selectedEventId, status })
+  });
+  closeModal('actionModal');
+  fetchAppointments();
+}
 
-    function initCalendar() {
-      const calendarEl = document.getElementById('calendar');
-      calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridWeek',
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        buttonText: { today: 'Σήμερα', month: 'Μήνας', week: 'Εβδομάδα', day: 'Ημέρα' },
-        locale: 'el',
-        slotMinTime: '08:00:00',
-        slotMaxTime: '22:00:00',
-        eventClick: (info) => openActionModal(info.event)
-      });
-      calendar.render();
-    }
+async function deleteAppointment() {
+  if (confirm('Είστε σίγουροι για τη διαγραφή;')) {
+    await adminFetch('/api/admin/delete', {
+      method: 'POST',
+      body: JSON.stringify({ id: selectedEventId })
+    });
+    closeModal('actionModal');
+    fetchAppointments();
+  }
+}
 
-    async function fetchAppointments() {
-      try {
-        const res = await adminFetch('/api/admin/appointments');
-        const data = await res.json();
-        
-        let pending = 0, booked = 0;
-        calendar.removeAllEvents();
+async function handleManualBooking(e) {
+  e.preventDefault();
+  await fetch(`${WORKER_URL}/api/bookings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: document.getElementById('custName').value,
+      phone: document.getElementById('custPhone').value,
+      massage_type: document.getElementById('massageType').value,
+      date: document.getElementById('bookDate').value,
+      time: document.getElementById('bookTime').value,
+      duration: parseInt(document.getElementById('bookDuration').value)
+    })
+  });
+  closeModal('bookingModal');
+  fetchAppointments();
+}
 
-        data.forEach(item => {
-          if (item.status === 'PENDING') pending++;
-          if (item.status === 'BOOKED') booked++;
+async function handleBlockSlot(e) {
+  e.preventDefault();
+  await adminFetch('/api/admin/block-slot', {
+    method: 'POST',
+    body: JSON.stringify({
+      date: document.getElementById('blockDate').value,
+      start_time: document.getElementById('blockStart').value,
+      end_time: document.getElementById('blockEnd').value,
+      reason: document.getElementById('blockReason').value
+    })
+  });
+  closeModal('blockModal');
+  fetchAppointments();
+}
 
-          let color = '#3b82f6';
-          if (item.status === 'PENDING') color = '#f59e0b';
-          if (item.status === 'BLOCKED') color = '#64748b';
-          if (item.status === 'REJECTED') color = '#ef4444';
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  
+</script>
 
-          calendar.addEvent({
-            id: item.id,
-            title: `${item.customer_name} (${item.massage_type})`,
-            start: `${item.date}T${item.start_time}`,
-            end: `${item.date}T${item.end_time}`,
-            backgroundColor: color,
-            extendedProps: item
-          });
-        });
-
-        document.getElementById('statTotal').innerText = data.length;
-        document.getElementById('statPending').innerText = pending;
-        document.getElementById('statBooked').innerText = booked;
-      } catch (e) { console.error(e); }
-    }
-
-    function openActionModal(event) {
-      selectedEventId = event.id;
-      const props = event.extendedProps;
-      document.getElementById('actTitle').innerText = props.customer_name;
-      document.getElementById('actDetails').innerHTML = `
-        <p><strong>Τηλέφωνο:</strong> ${props.customer_phone || '-'}</p>
-        <p><strong>Υπηρεσία:</strong> ${props.massage_type}</p>
-        <p><strong>Ώρα:</strong> ${props.start_time} - ${props.end_time}</p>
-        <p><strong>Κατάσταση:</strong> ${props.status}</p>
-      `;
-      document.getElementById('btnApprove').style.display = props.status === 'BLOCKED' ? 'none' : 'inline-flex';
-      openModal('actionModal');
-    }
-
-    async function updateStatus(status) {
-      await adminFetch('/api/admin/update-status', {
-        method: 'POST',
-        body: JSON.stringify({ id: selectedEventId, status })
-      });
-      closeModal('actionModal');
-      fetchAppointments();
-    }
-
-    async function deleteAppointment() {
-      if (confirm('Είστε σίγουροι για τη διαγραφή;')) {
-        await adminFetch('/api/admin/delete', {
-          method: 'POST',
-          body: JSON.stringify({ id: selectedEventId })
-        });
-        closeModal('actionModal');
-        fetchAppointments();
-      }
-    }
-
-    async function handleManualBooking(e) {
-      e.preventDefault();
-      await fetch(`${WORKER_URL}/api/bookings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: document.getElementById('custName').value,
-          phone: document.getElementById('custPhone').value,
-          massage_type: document.getElementById('massageType').value,
-          date: document.getElementById('bookDate').value,
-          time: document.getElementById('bookTime').value,
-          duration: parseInt(document.getElementById('bookDuration').value)
-        })
-      });
-      closeModal('bookingModal');
-      fetchAppointments();
-    }
-
-    async function handleBlockSlot(e) {
-      e.preventDefault();
-      await adminFetch('/api/admin/block-slot', {
-        method: 'POST',
-        body: JSON.stringify({
-          date: document.getElementById('blockDate').value,
-          start_time: document.getElementById('blockStart').value,
-          end_time: document.getElementById('blockEnd').value,
-          reason: document.getElementById('blockReason').value
-        })
-      });
-      closeModal('blockModal');
-      fetchAppointments();
-    }
-
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-  </script>
 </body>
 </html>
