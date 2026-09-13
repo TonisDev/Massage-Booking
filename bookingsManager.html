@@ -607,7 +607,7 @@
   function initCalendar() {
     const calendarEl = document.getElementById('calendar');
 
-    calendar = new FullCalendar.Calendar(calendarEl, {
+calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'timeGridWeek',
       height: 'auto',
       expandRows: true,
@@ -631,12 +631,32 @@
       slotMinTime: '08:00:00',
       slotMaxTime: '22:00:00',
       scrollTime: '09:00:00',
+      
+      // 💥 ΠΡΟΣΘΗΚΗ: Δυναμική απόδοση κλάσεων βάσει status 💥
+      eventClassNames: function(arg) {
+        const status = arg.event.extendedProps.status;
+        if (status === 'BOOKED' || status === 'CONFIRMED') {
+          return ['fc-event-booked'];
+        } else if (status === 'PENDING') {
+          return ['fc-event-pending'];
+        } else if (status === 'BLOCKED') {
+          return ['fc-event-blocked'];
+        }
+        return [];
+      },
+
+      // 💥 ΠΡΟΣΘΗΚΗ: Ορισμός data-status attribute στο DOM 💥
+      eventDidMount: function(info) {
+        if (info.event.extendedProps.status) {
+          info.el.setAttribute('data-status', info.event.extendedProps.status);
+        }
+      },
+
       eventClick: info => openActionModal(info.event)
     });
 
     calendar.render();
   }
-
   async function fetchAppointments() {
     try {
       const res = await adminFetch('/api/admin/appointments');
