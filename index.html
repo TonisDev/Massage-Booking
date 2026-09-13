@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <!-- Flatpickr CSS & JS for Calendar View -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<!-- Optional Greek Localization for Calendar -->
-<script src="https://npmcdn.flatpickr/dist/l10n/gr.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- Greek Localization for Calendar (Fixed CDN URL) -->
+  <script src="https://npmcdn.flatpickr.com/dist/l10n/gr.js"></script>
+  
   <title>Αίτημα Ραντεβού Μασάζ</title>
   <style>
     :root {
@@ -148,111 +149,111 @@
 <div class="container">
   <h1>Αίτημα Ραντεβού Μασάζ</h1>
   <p class="subtitle" style="line-height: 1.5; margin-bottom: 20px;">
-    Δηλώστε εύκολα την ημέρα και την ώρα που προτιμάτε. 
+    Δηλώστε εύκολα την ημέρα και την ώρα που προτιμάτε. <br/>
     Λόγω ευέλικτου ωραρίου, η υποβολή λειτουργεί ως <b>αίτημα ενδιαφέροντος</b> και θα επικοινωνήσω προσωπικά μαζί σας (μέσω τηλεφώνου ή Instagram) για την επιβεβαίωση.
   </p>
 
   <form id="bookingForm">
-    <!-- Υπόλοιπη φόρμα... -->
-    <form id="bookingForm">
-      <!-- Honeypot -->
-      <input type="text" id="website" name="website" class="honeypot" tabindex="-1" autocomplete="off" />
+    <!-- Honeypot for Bot Prevention -->
+    <input type="text" id="website" name="website" class="honeypot" tabindex="-1" autocomplete="off" />
 
-      <div class="form-group">
-        <label for="name">Όνομα / Επώνυμο *</label>
-        <input type="text" id="name" required placeholder="π.χ. Γιώργος Παπαδόπουλος" />
-      </div>
+    <div class="form-group">
+      <label for="name">Όνομα / Επώνυμο *</label>
+      <input type="text" id="name" required placeholder="π.χ. Γιώργος Παπαδόπουλος" />
+    </div>
 
-      <div class="form-group">
-        <label for="phone">Τηλέφωνο</label>
-        <input type="tel" id="phone" placeholder="π.χ. 6912345678" />
-      </div>
+    <div class="form-group">
+      <label for="phone">Τηλέφωνο (συμπληρώστε τουλάχιστον ένα τρόπου επικοινωνίας)</label>
+      <input type="tel" id="phone" placeholder="π.χ. 6912345678" />
+    </div>
 
-      <div class="form-group">
-        <label for="instagram">Instagram Username</label>
-        <input type="text" id="instagram" placeholder="π.χ. my_username" />
-      </div>
+    <div class="form-group">
+      <label for="instagram">Instagram Username</label>
+      <input type="text" id="instagram" placeholder="π.χ. my_username" />
+    </div>
 
-      <div class="form-group">
-        <label for="massageType">Είδος Μασάζ *</label>
-        <select id="massageType" required>
-          <option value="Χαλαρωτικό (Relaxing)">Χαλαρωτικό (Relaxing)</option>
-          <option value="Deep Tissue">Deep Tissue</option>
-          <option value="Αθλητικό (Sports)">Αθλητικό (Sports)</option>
-          <option value="Εστίαση σε τραυματισμό/πόνο">Εστίαση σε τραυματισμό/πόνο</option>
-        </select>
-      </div>
+    <div class="form-group">
+      <label for="massageType">Είδος Μασάζ *</label>
+      <select id="massageType" required>
+        <option value="Χαλαρωτικό (Relaxing)">Χαλαρωτικό (Relaxing)</option>
+        <option value="Deep Tissue">Deep Tissue</option>
+        <option value="Αθλητικό (Sports)">Αθλητικό (Sports)</option>
+        <option value="Εστίαση σε τραυματισμό/πόνο">Εστίαση σε τραυματισμό/πόνο</option>
+      </select>
+    </div>
 
-      <div class="form-group">
-        <label for="service">Διάρκεια *</label>
-        <select id="service" required>
-          <option value="60 λεπτά">60 λεπτά</option>
-          <option value="90 λεπτά">90 λεπτά</option>
-          <option value="120 λεπτά">120 λεπτά</option>
-        </select>
-      </div>
+    <div class="form-group">
+      <label for="service">Διάρκεια *</label>
+      <select id="service" required>
+        <option value="60 λεπτά">60 λεπτά</option>
+        <option value="90 λεπτά">90 λεπτά</option>
+        <option value="120 λεπτά">120 λεπτά</option>
+      </select>
+    </div>
 
-<div class="form-group">
-  <label for="date">Ημερομηνία *</label>
-  <input type="text" id="date" required placeholder="Επιλέξτε ημερομηνία..." />
+    <div class="form-group">
+      <label for="date">Ημερομηνία *</label>
+      <input type="text" id="date" required placeholder="Επιλέξτε ημερομηνία..." />
+    </div>
+
+    <div class="form-group">
+      <label for="timeSlot">Ώρα *</label>
+      <select id="timeSlot" required>
+        <option value="09:00">09:00</option>
+        <option value="09:30">09:30</option>
+        <option value="10:00">10:00</option>
+        <option value="10:30">10:30</option>
+        <option value="11:00">11:00</option>
+        <option value="11:30">11:30</option>
+        <option value="12:00">12:00</option>
+        <option value="12:30">12:30</option>
+        <option value="13:00">13:00</option>
+        <option value="13:30">13:30</option>
+        <option value="14:00">14:00</option>
+        <option value="14:30">14:30</option>
+        <option value="15:00">15:00</option>
+        <option value="15:30">15:30</option>
+        <option value="16:00">16:00</option>
+        <option value="16:30">16:30</option>
+        <option value="17:00">17:00</option>
+        <option value="17:30">17:30</option>
+        <option value="18:00">18:00</option>
+        <option value="18:30">18:30</option>
+        <option value="19:00">19:00</option>
+        <option value="19:30">19:30</option>
+        <option value="20:00">20:00</option>
+        <option value="20:30">20:30</option>
+        <option value="21:00">21:00</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Σημειώσεις / Παρατηρήσεις</label>
+      <textarea id="notes" placeholder="Οποιαδήποτε λεπτομέρεια θέλετε να γνωρίζουμε..."></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
+  </form>
+
+  <div id="statusBox" class="status-box"></div>
 </div>
 
-      <div class="form-group">
-        <label for="timeSlot">Ώρα *</label>
-        <select id="timeSlot" required>
-          <option value="09:00">09:00</option>
-          <option value="09:30">09:30</option>
-          <option value="10:00">10:00</option>
-          <option value="10:30">10:30</option>
-          <option value="11:00">11:00</option>
-          <option value="11:30">11:30</option>
-          <option value="12:00">12:00</option>
-          <option value="12:30">12:30</option>
-          <option value="13:00">13:00</option>
-          <option value="13:30">13:30</option>
-          <option value="14:00">14:00</option>
-          <option value="14:30">14:30</option>
-          <option value="15:00">15:00</option>
-          <option value="15:30">15:30</option>
-          <option value="16:00">16:00</option>
-          <option value="16:30">16:30</option>
-          <option value="17:00">17:00</option>
-          <option value="17:30">17:30</option>
-          <option value="18:00">18:00</option>
-          <option value="18:30">18:30</option>
-          <option value="19:00">19:00</option>
-          <option value="19:30">19:30</option>
-          <option value="20:00">20:00</option>
-          <option value="20:30">20:30</option>
-          <option value="21:00">21:00</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="notes">Σημειώσεις / Παρατηρήσεις</label>
-        <textarea id="notes" placeholder="Οποιαδήποτε λεπτομέρεια θέλετε να γνωρίζουμε..."></textarea>
-      </div>
-
-      <button type="submit" id="submitBtn">Αποστολή Αιτήματος</button>
-    </form>
-
-    <div id="statusBox" class="status-box"></div>
-  </div>
-
-  <script>
+<script>
 document.addEventListener("DOMContentLoaded", function () {
   const WORKER_URL = "https://massage-booking-proxy.tonisdevv.workers.dev";
   const form = document.getElementById("bookingForm");
   const statusBox = document.getElementById("statusBox");
   const submitBtn = document.getElementById("submitBtn");
 
-  // Initialize Flatpickr Calendar (Replaces the old date code)
+  // Initialize Flatpickr Calendar
   const datePicker = flatpickr("#date", {
     locale: "gr",
     dateFormat: "Y-m-d",
+    altInput: true,
+    altFormat: "j F Y",
     defaultDate: "today",
     minDate: "today",
-    disableMobile: "true" // Set "true" if you want Flatpickr UI on mobile phones too
+    disableMobile: "true"
   });
 
   form.addEventListener("submit", async function (e) {
@@ -260,13 +261,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     statusBox.style.display = "none";
     statusBox.className = "status-box";
+
+    const phone = document.getElementById("phone").value.trim();
+    const instagram = document.getElementById("instagram").value.trim();
+
+    // Client-side validation: check if at least one contact info is provided
+    if (!phone && !instagram) {
+      statusBox.textContent = "❌ Παρακαλώ συμπληρώστε Τηλέφωνο ή Instagram username.";
+      statusBox.classList.add("error");
+      statusBox.style.display = "block";
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = "Αποστολή...";
 
     const formData = {
       name: document.getElementById("name").value,
-      phone: document.getElementById("phone").value,
-      instagram: document.getElementById("instagram").value,
+      phone: phone,
+      instagram: instagram,
       massageType: document.getElementById("massageType").value,
       service: document.getElementById("service").value,
       date: document.getElementById("date").value,
@@ -303,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
         statusBox.classList.add("success");
         statusBox.style.display = "block";
         form.reset();
-        datePicker.setDate(new Date()); // Reset calendar to today after send
+        datePicker.setDate(new Date()); // Reset calendar
       } else {
         throw new Error(result.error || "Αποτυχία αποστολής.");
       }
@@ -318,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-  </script>
+</script>
 
 </body>
 </html>
