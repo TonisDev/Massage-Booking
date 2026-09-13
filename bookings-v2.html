@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Κράτηση Μασάζ - Test V2</title>
+    
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #d4af37; /* Gold/Bronze */
+            --text: #f0f0f0;
+            --muted: #a0a0a0;
+            --border: #333333;
+            --error: #ff5555;
+            --success: #4caf50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .booking-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--accent);
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Honeypot anti-spam field (hidden from humans) */
+        .website-field {
+            display: none !important;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--accent);
+            color: #121212;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        .btn-submit:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        #message-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .msg-success {
+            background-color: rgba(76, 175, 80, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .msg-error {
+            background-color: rgba(255, 85, 85, 0.15);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="booking-card">
+    <h2>Αίτημα Κράτησης (V2)</h2>
+
+    <form id="booking-form">
+        <!-- Honeypot field against bots -->
+        <div class="website-field">
+            <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="name">Ονοματεπώνυμο *</label>
+            <input type="text" id="name" required placeholder="π.χ. Γιώργος Παπαδόπουλος">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Τηλέφωνο *</label>
+            <input type="tel" id="phone" required placeholder="π.χ. 6912345678">
+        </div>
+
+        <div class="form-group">
+            <label for="instagram">Instagram Username (προαιρετικό)</label>
+            <input type="text" id="instagram" placeholder="π.χ. my_handle">
+        </div>
+
+        <div class="form-group">
+            <label for="massage_type">Είδος Μασάζ *</label>
+            <select id="massage_type" required>
+                <option value="Relaxing">Relaxing Massage</option>
+                <option value="Deep Tissue">Deep Tissue Massage</option>
+                <option value="Sports">Sports Massage</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="duration">Διάρκεια *</label>
+            <select id="duration" required>
+                <option value="60" selected>60 Λεπτά</option>
+                <option value="90">90 Λεπτά</option>
+                <option value="120">120 Λεπτά</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="date">Ημερομηνία *</label>
+            <input type="text" id="date" placeholder="Επιλέξτε Ημερομηνία" required readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="time">Διαθέσιμη Ώρα *</label>
+            <select id="time" required disabled>
+                <option value="">-- Επιλέξτε πρώτα Ημερομηνία --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Σημειώσεις / Παρατηρήσεις</label>
+            <textarea id="notes" rows="2" placeholder="Π.χ. Πόνος στον αυχένα..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submit-btn">Υποβολή Αιτήματος</button>
+    </form>
+
+    <div id="message-box"></div>
+</div>
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/gr.js"></script>
+
+<script>
+    // URL του 2ου Worker σου (Αντικατάστησε το με το πραγματικό URL του Worker v2)
+    const WORKER_URL = 'https://general-bookings.tonisdevv.workers.dev';
+
+    const dateInput = document.getElementById('date');
+    const durationInput = document.getElementById('duration');
+    const timeSelect = document.getElementById('time');
+    const form = document.getElementById('booking-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const messageBox = document.getElementById('message-box');
+
+    // 1. Αρχικοποίηση Flatpickr Calendar
+    const fp = flatpickr(dateInput, {
+        locale: 'gr',
+        dateFormat: 'Y-m-d',
+        minDate: 'today',
+        onChange: function(selectedDates, dateStr) {
+            if (dateStr) {
+                fetchAvailableSlots(dateStr, durationInput.value);
+            }
+        }
+    });
+
+    // 2. Όταν αλλάζει η διάρκεια, ξαναφορτώνουμε τα slots για την επιλεγμένη ημερομηνία
+    durationInput.addEventListener('change', () => {
+        if (dateInput.value) {
+            fetchAvailableSlots(dateInput.value, durationInput.value);
+        }
+    });
+
+    // 3. Συνάρτηση που καλεί το API /api/availability
+    async function fetchAvailableSlots(dateStr, duration) {
+        timeSelect.disabled = true;
+        timeSelect.innerHTML = '<option value="">Φόρτωση διαθεσιμοτήτων...</option>';
+
+        try {
+            const response = await fetch(`${WORKER_URL}/api/availability?date=${dateStr}&duration=${duration}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Σφάλμα κατά τη φόρτωση ωρών');
+            }
+
+            timeSelect.innerHTML = '';
+
+            if (!data.available_slots || data.available_slots.length === 0) {
+                timeSelect.innerHTML = '<option value="">Δεν υπάρχουν διαθέσιμες ώρες</option>';
+                return;
+            }
+
+            timeSelect.innerHTML = '<option value="">-- Επιλέξτε Ώρα --</option>';
+            data.available_slots.forEach(slot => {
+                const opt = document.createElement('option');
+                opt.value = slot;
+                opt.textContent = slot;
+                timeSelect.appendChild(opt);
+            });
+
+            timeSelect.disabled = false;
+
+        } catch (err) {
+            console.error('Availability Error:', err);
+            timeSelect.innerHTML = '<option value="">Αποτυχία φόρτωσης ωρών</option>';
+        }
+    }
+
+    // 4. Form Submit Handler (Προς το παρόν placeholder μέχρι το STEP 5)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Anti-bot check
+        if (document.getElementById('website').value !== '') {
+            return; // Bot detected
+        }
+
+        showMessage('Η υποβολή θα ενεργοποιηθεί στο STEP 5 (POST /api/bookings)', 'msg-error');
+    });
+
+    function showMessage(msg, className) {
+        messageBox.className = className;
+        messageBox.textContent = msg;
+        messageBox.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
