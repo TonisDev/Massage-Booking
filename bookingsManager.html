@@ -175,30 +175,36 @@
 
     #calendar { padding: 8px 14px 16px; }
 
-    .fc {
-      --fc-border-color: #263247;
-      --fc-page-bg-color: #111827;
-      --fc-neutral-bg-color: #0f172a;
-      --fc-today-bg-color: #1b2340;
-      --fc-small-font-size: .78rem;
-    }
-    .fc .fc-toolbar { padding: 10px 0 14px; gap: 10px; }
-    .fc .fc-toolbar-title { font-size: 1.08rem; font-weight: 750; letter-spacing: -.02em; }
-    .fc .fc-button {
-      border: 0 !important; border-radius: 8px !important;
-      box-shadow: none !important; font-weight: 600; font-size: .74rem;
-      padding: 7px 10px;
-    }
-    .fc .fc-button-primary { background: #eef2ff !important; color: #4338ca !important; }
-    .fc .fc-button-primary:hover, .fc .fc-button-primary.fc-button-active {
-      background: var(--primary) !important; color: #fff !important;
-    }
-    .fc .fc-col-header-cell-cushion { color: #cbd5e1; font-size: .8rem; padding: 9px 4px; }
-    .fc .fc-daygrid-day-number { color: #cbd5e1; font-size: .8rem; padding: 8px; }
-    .fc .fc-timegrid-slot-label { color: #94a3b8; font-size: .76rem; }
+/* Τετραγωνισμένα slots (αλλαγή border-radius από 6px σε 2px ή 0px) */
     .fc .fc-event {
-      border: 0 !important; border-radius: 6px; padding: 2px 5px;
-      font-size: .75rem; font-weight: 600; cursor: pointer;
+      border: 0 !important;
+      border-radius: 2px !important; /* Πιο τετραγωνισμένα slots */
+      padding: 3px 6px;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Πράσινο χρώμα για τα επικυρωμένα (BOOKED / Confirmed) slots */
+    .fc-event.fc-event-booked,
+    .fc-event[data-status="BOOKED"] {
+      background-color: var(--success) !important; /* #059669 */
+      border-left: 3px solid #10b981 !important;
+      color: #ffffff !important;
+    }
+
+    /* Πορτοκαλί για τα PENDING */
+    .fc-event.fc-event-pending,
+    .fc-event[data-status="PENDING"] {
+      background-color: var(--warning) !important; /* #d97706 */
+      color: #ffffff !important;
+    }
+
+    /* Γκρι/Σκούρο για τα BLOCKED */
+    .fc-event.fc-event-blocked,
+    .fc-event[data-status="BLOCKED"] {
+      background-color: #475569 !important;
+      color: #ffffff !important;
     }
 
     /* ---------- Modal ---------- */
