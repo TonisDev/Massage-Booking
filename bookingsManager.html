@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Bookings</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-slate: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg-slate); color: var(--text-main); min-height: 100vh; }
+
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky; top: 0; z-index: 50;
+    }
+
+    .logo-area { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-area h1 { font-size: 1.25rem; font-weight: 700; }
+
+    .nav-actions { display: flex; gap: 0.75rem; }
+
+    main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.2rem; border-radius: 8px;
+      font-weight: 500; font-size: 0.875rem; cursor: pointer;
+      border: 1px solid transparent; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: white; border-color: var(--border-color); color: var(--text-main); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem; margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--card-bg); padding: 1.25rem; border-radius: 12px;
+      border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .stat-card .title { font-size: 0.875rem; color: var(--text-muted); font-weight: 500; }
+    .stat-card .value { font-size: 1.75rem; font-weight: 700; margin-top: 0.25rem; }
+
+    .calendar-card {
+      background: var(--card-bg); border-radius: 12px;
+      border: 1px solid var(--border-color); padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.5); display: none;
+      justify-content: center; align-items: center; z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal {
+      background: white; border-radius: 12px; width: 100%;
+      max-width: 480px; padding: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .modal-body { display: flex; flex-direction: column; gap: 1rem; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group label { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
+    .form-group input, .form-group select {
+      padding: 0.6rem; border: 1px solid var(--border-color);
+      border-radius: 6px; font-size: 0.9rem; outline: none;
+    }
+
+    .modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+
+    /* Login Screen */
+    #loginOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .login-box { background: white; padding: 2.5rem; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; }
+
+    .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-color); }
+    .fc-button-primary { background-color: var(--primary) !important; border-color: var(--primary) !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Login Modal -->
+  <div id="loginOverlay">
+    <div class="login-box">
+      <i data-lucide="shield-check" style="width: 48px; height: 48px; color: var(--primary); margin-bottom: 1rem;"></i>
+      <h2 style="margin-bottom:0.5rem;">Admin Login</h2>
+      <p style="color:#64748b; font-size:0.875rem; margin-bottom:1.5rem;">Εισάγετε τον κωδικό πρόσβασης</p>
+      <input type="password" id="adminKeyInput" placeholder="Admin Key" style="width:100%; padding:0.75rem; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:1rem; outline:none;">
+      <button onclick="saveAdminKey()" class="btn btn-primary" style="width:100%; justify-content:center;">Είσοδος</button>
+    </div>
+  </div>
+
+  <!-- Main App View -->
+  <header>
+    <div class="logo-area">
+      <i data-lucide="calendar" style="color: var(--primary);"></i>
+      <h1>Booking Management System</h1>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-outline" onclick="openModal('blockModal')"><i data-lucide="lock"></i> Κλείσιμο Slot</button>
+      <button class="btn btn-primary" onclick="openModal('bookingModal')"><i data-lucide="plus"></i> Νέο Ραντεβού</button>
+      <button class="btn btn-outline" onclick="logout()" style="color:#ef4444;"><i data-lucide="log-out"></i></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="title">Συνολικά Ραντεβού</span>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="title">Εκκρεμή (Pending)</span>
+        <div class="value" id="statPending" style="color: #d97706;">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="title">Εγκεκριμένα (Booked)</span>
+        <div class="value" id="statBooked" style="color: #059669;">0</div>
+      </div>
+    </div>
+
+    <div class="calendar-card">
+      <div id="calendar"></div>
+    </div>
+  </main>
+
+  <!-- MODAL: Χειροκίνητο Ραντεβού -->
+  <div class="modal-overlay" id="bookingModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Προσθήκη Νέου Ραντεβού</h3>
+        <button class="btn btn-outline" style="padding: 2px 6px;" onclick="closeModal('bookingModal')">✕</button>
+      </div>
+      <form onsubmit="handleManualBooking(event)">
+        <div class="modal-body">
+          <div class="form-group"><label>Όνομα Πελάτη</label><input type="text" id="custName" required></div>
+          <div class="form-group"><label>Τηλέφωνο</label><input type="tel" id="custPhone" required></div>
+          <div class="form-group">
+            <label>Υπηρεσία</label>
+            <select id="massageType">
+              <option value="Relaxing Massage">Relaxing Massage</option>
+              <option value="Deep Tissue">Deep Tissue</option>
+              <option value="Sports Massage">Sports Massage</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex:1;"><label>Ημερομηνία</label><input type="date" id="bookDate" required></div>
+            <div class="form-group" style="flex:1;"><label>Ώρα</label><input type="time" id="bookTime" required></div>
+          </div>
+          <div class="form-group">
+            <label>Διάρκεια</label>
+            <select id="bookDuration">
+              <option value="60">60 λεπτά</option>
+              <option value="90">90 λεπτά</option>
+              <option value="120">120 λεπτά</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('bookingModal')">Ακύρωση</button>
+          <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Δέσμευση Slot -->
+  <div class="modal-overlay" id="blockModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Δέσμευση Χρονικού Διαστήματος</h3>
+        <button class="btn btn-outline" style="padding: 2px 6px;" onclick="closeModal('blockModal')">✕</button>
+      </div>
+      <form onsubmit="handleBlockSlot(event)">
+        <div class="modal-body">
+          <div class="form-group"><label>Ημερομηνία</label><input type="date" id="blockDate" required></div>
+          <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex:1;"><label>Από</label><input type="time" id="blockStart" required></div>
+            <div class="form-group" style="flex:1;"><label>Έως</label><input type="time" id="blockEnd" required></div>
+          </div>
+          <div class="form-group"><label>Αιτιολογία</label><input type="text" id="blockReason" placeholder="π.χ. Διάλειμμα"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('blockModal')">Ακύρωση</button>
+          <button type="submit" class="btn btn-danger">Δέσμευση</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Λεπτομέρειες Ενέργειας Ραντεβού -->
+  <div class="modal-overlay" id="actionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="actTitle">Διαχείριση Ραντεβού</h3>
+        <button class="btn btn-outline" style="padding: 2px 6px;" onclick="closeModal('actionModal')">✕</button>
+      </div>
+      <div class="modal-body" id="actDetails"></div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="deleteAppointment()">Διαγραφή</button>
+        <button class="btn btn-primary" id="btnApprove" onclick="updateStatus('BOOKED')">Έγκριση</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WORKER_URL = "https://general-bookings.tonisdevv.workers.dev";
+    let ADMIN_KEY = localStorage.getItem('ADMIN_KEY') || '';
+    let calendar;
+    let selectedEventId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      if (ADMIN_KEY) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        initCalendar();
+        fetchAppointments();
+      }
+    });
+
+    function saveAdminKey() {
+      const val = document.getElementById('adminKeyInput').value.trim();
+      if (val) {
+        localStorage.setItem('ADMIN_KEY', val);
+        ADMIN_KEY = val;
+        document.getElementById('loginOverlay').style.display = 'none';
+        initCalendar();
+        fetchAppointments();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('ADMIN_KEY');
+      location.reload();
+    }
+
+    async function adminFetch(endpoint, options = {}) {
+      const res = await fetch(`${WORKER_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': ADMIN_KEY,
+          ...(options.headers || {})
+        }
+      });
+      if (res.status === 401) {
+        alert('Λάθος Admin Key!');
+        logout();
+        throw new Error('Unauthorized');
+      }
+      return res;
+    }
+
+    function initCalendar() {
+      const calendarEl = document.getElementById('calendar');
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        buttonText: { today: 'Σήμερα', month: 'Μήνας', week: 'Εβδομάδα', day: 'Ημέρα' },
+        locale: 'el',
+        slotMinTime: '08:00:00',
+        slotMaxTime: '22:00:00',
+        eventClick: (info) => openActionModal(info.event)
+      });
+      calendar.render();
+    }
+
+    async function fetchAppointments() {
+      try {
+        const res = await adminFetch('/api/admin/appointments');
+        const data = await res.json();
+        
+        let pending = 0, booked = 0;
+        calendar.removeAllEvents();
+
+        data.forEach(item => {
+          if (item.status === 'PENDING') pending++;
+          if (item.status === 'BOOKED') booked++;
+
+          let color = '#3b82f6';
+          if (item.status === 'PENDING') color = '#f59e0b';
+          if (item.status === 'BLOCKED') color = '#64748b';
+          if (item.status === 'REJECTED') color = '#ef4444';
+
+          calendar.addEvent({
+            id: item.id,
+            title: `${item.customer_name} (${item.massage_type})`,
+            start: `${item.date}T${item.start_time}`,
+            end: `${item.date}T${item.end_time}`,
+            backgroundColor: color,
+            extendedProps: item
+          });
+        });
+
+        document.getElementById('statTotal').innerText = data.length;
+        document.getElementById('statPending').innerText = pending;
+        document.getElementById('statBooked').innerText = booked;
+      } catch (e) { console.error(e); }
+    }
+
+    function openActionModal(event) {
+      selectedEventId = event.id;
+      const props = event.extendedProps;
+      document.getElementById('actTitle').innerText = props.customer_name;
+      document.getElementById('actDetails').innerHTML = `
+        <p><strong>Τηλέφωνο:</strong> ${props.customer_phone || '-'}</p>
+        <p><strong>Υπηρεσία:</strong> ${props.massage_type}</p>
+        <p><strong>Ώρα:</strong> ${props.start_time} - ${props.end_time}</p>
+        <p><strong>Κατάσταση:</strong> ${props.status}</p>
+      `;
+      document.getElementById('btnApprove').style.display = props.status === 'BLOCKED' ? 'none' : 'inline-flex';
+      openModal('actionModal');
+    }
+
+    async function updateStatus(status) {
+      await adminFetch('/api/admin/update-status', {
+        method: 'POST',
+        body: JSON.stringify({ id: selectedEventId, status })
+      });
+      closeModal('actionModal');
+      fetchAppointments();
+    }
+
+    async function deleteAppointment() {
+      if (confirm('Είστε σίγουροι για τη διαγραφή;')) {
+        await adminFetch('/api/admin/delete', {
+          method: 'POST',
+          body: JSON.stringify({ id: selectedEventId })
+        });
+        closeModal('actionModal');
+        fetchAppointments();
+      }
+    }
+
+    async function handleManualBooking(e) {
+      e.preventDefault();
+      await fetch(`${WORKER_URL}/api/bookings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: document.getElementById('custName').value,
+          phone: document.getElementById('custPhone').value,
+          massage_type: document.getElementById('massageType').value,
+          date: document.getElementById('bookDate').value,
+          time: document.getElementById('bookTime').value,
+          duration: parseInt(document.getElementById('bookDuration').value)
+        })
+      });
+      closeModal('bookingModal');
+      fetchAppointments();
+    }
+
+    async function handleBlockSlot(e) {
+      e.preventDefault();
+      await adminFetch('/api/admin/block-slot', {
+        method: 'POST',
+        body: JSON.stringify({
+          date: document.getElementById('blockDate').value,
+          start_time: document.getElementById('blockStart').value,
+          end_time: document.getElementById('blockEnd').value,
+          reason: document.getElementById('blockReason').value
+        })
+      });
+      closeModal('blockModal');
+      fetchAppointments();
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  </script>
+</body>
+</html>
